@@ -109,9 +109,9 @@ public sealed class Stat
    {
       roundDigits = Math.Clamp(roundDigits, 0, MAXIMUM_ROUND_DIGITS);
       
-      var flatModsValue = CalculateFlatModsValue(_baseValue);
-      var additiveModsValue = CalculateAdditiveModsValue(_baseValue);
-      var finalValue = CalculateMultiplicativeModsValue(flatModsValue + additiveModsValue);
+      float flatModsValue = CalculateFlatModsValue(_baseValue);
+      float additiveModsValue = CalculateAdditiveModsValue(_baseValue);
+      float finalValue = CalculateMultiplicativeModsValue(flatModsValue + additiveModsValue);
 
       _isDirty = false;
       OnValueChanged();
@@ -121,7 +121,7 @@ public sealed class Stat
 
    private float CalculateFlatModsValue(float startingValue)
    {
-      var calculatedValue = startingValue;
+      float calculatedValue = startingValue;
       float flatModifiersSum = 0f;
       
       for (var i = 0; i < _flatModifiers.Count; i++)
@@ -134,7 +134,7 @@ public sealed class Stat
 
    private float CalculateAdditiveModsValue(float startingValue)
    {
-      var calculatedValue = startingValue;
+      float calculatedValue = startingValue;
       float additiveModifiersSum = 0f;
       
       for (var i = 0; i < _additivePercentageModifiers.Count; i++)
@@ -147,7 +147,7 @@ public sealed class Stat
 
    private float CalculateMultiplicativeModsValue(float startingValue)
    {
-      var calculatedValue = startingValue;
+      float calculatedValue = startingValue;
       
       for (var i = 0; i < _multiplicativePercentageModifiers.Count; i++)
          calculatedValue *= 1 + _multiplicativePercentageModifiers[i];
@@ -168,9 +168,9 @@ public sealed class Stat
    
    private bool TryRemoveAllModifiersOfSourceFromList(object source, List<Modifier> listOfModifiers)
    {
-      var isModifierRemoved = false;
+      bool isModifierRemoved = false;
       
-      for (var i = 0; i < listOfModifiers.Count; i++)
+      for (var i = listOfModifiers.Count - 1; i >= 0; i--)
       {
          if (ReferenceEquals(source, listOfModifiers[i].Source))
          {

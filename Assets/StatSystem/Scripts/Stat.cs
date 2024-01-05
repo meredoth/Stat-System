@@ -116,6 +116,8 @@ public sealed class Stat
       TryRemoveAllModifiersOfSourceFromList(source, _additivePercentageModifiers) ||
       TryRemoveAllModifiersOfSourceFromList(source, _multiplicativePercentageModifiers);
 
+   public static implicit operator float(Stat stat) => stat.Value;
+   
    private float CalculateModifiedValue(int roundDigits)
    {
       roundDigits = Math.Clamp(roundDigits, 0, MAXIMUM_ROUND_DIGITS);

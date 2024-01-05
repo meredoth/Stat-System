@@ -12,9 +12,10 @@ public sealed class Stat
    {
       get
       {
-         if(_isDirty)
+         if(IsDirty)
          {
             _currentValue = CalculateModifiedValue(_digitAccuracy);
+            OnValueChanged();
          }
 
          return _currentValue;
@@ -27,6 +28,7 @@ public sealed class Stat
       {
          _baseValue = value;
          _currentValue = CalculateModifiedValue(_digitAccuracy);
+         OnValueChanged();
       }
    }
 
@@ -34,9 +36,21 @@ public sealed class Stat
       MultiplicativeModifiers) Modifiers =>
       (_flatModifiers.AsReadOnly(), _additivePercentageModifiers.AsReadOnly(), _multiplicativePercentageModifiers.AsReadOnly());
 
+   private bool IsDirty
+   {
+      get => _isDirty;
+      set
+      {
+         _isDirty = value;
+         if(_isDirty)
+            OnModifiersChanged();
+      }
+   }
+
    // Gets raised only when the value is calculated with the available modifiers,
    // NOT whenever a modifier id added/removed.
    public event Action ValueChanged;
+   public event Action ModifiersChanged;
    
    private const int MAXIMUM_ROUND_DIGITS = 8;
 
@@ -64,13 +78,13 @@ public sealed class Stat
 
    public void AddModifier(Modifier modifier)
    {
-      _isDirty = true;
+      IsDirty = true;
       
       switch (modifier.Type)
       {
          case ModifierType.Flat:
             CheckListCapacity(_flatModifiers);
-           _flatModifiers.Add(modifier);
+            _flatModifiers.Add(modifier);
             break;
          case ModifierType.Additive:
             CheckListCapacity(_additivePercentageModifiers);
@@ -102,9 +116,6 @@ public sealed class Stat
       TryRemoveAllModifiersOfSourceFromList(source, _additivePercentageModifiers) ||
       TryRemoveAllModifiersOfSourceFromList(source, _multiplicativePercentageModifiers);
 
-   // For avoiding evaluation from the value getter
-   public void ForceModifiersCalculation() => CalculateModifiedValue(_digitAccuracy);
-   
    private float CalculateModifiedValue(int roundDigits)
    {
       roundDigits = Math.Clamp(roundDigits, 0, MAXIMUM_ROUND_DIGITS);
@@ -113,9 +124,8 @@ public sealed class Stat
       float additiveModsValue = CalculateAdditiveModsValue(_baseValue);
       float finalValue = CalculateMultiplicativeModsValue(flatModsValue + additiveModsValue);
 
-      _isDirty = false;
-      OnValueChanged();
-      
+      IsDirty = false;
+
       return (float)Math.Round(finalValue, roundDigits);
    }
 
@@ -159,7 +169,7 @@ public sealed class Stat
    {
       if (listOfModifiers.Remove(modifier))
       {
-         _isDirty = true;
+         IsDirty = true;
          return true;
       }
       
@@ -175,15 +185,16 @@ public sealed class Stat
          if (ReferenceEquals(source, listOfModifiers[i].Source))
          {
             listOfModifiers.RemoveAt(i);
-            _isDirty = true;
+            IsDirty = true;
             isModifierRemoved = true;
          }
       }
-      
+
       return isModifierRemoved;
    }
 
    private void OnValueChanged() => ValueChanged?.Invoke();
+   private void OnModifiersChanged() => ModifiersChanged?.Invoke();
 
    [Conditional("UNITY_EDITOR")]
    private static void CheckListCapacity(List<Modifier> modifiersList, [CallerArgumentExpression("modifiersList")] string name = null)

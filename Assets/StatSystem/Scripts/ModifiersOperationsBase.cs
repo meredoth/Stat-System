@@ -4,13 +4,11 @@ using Debug = UnityEngine.Debug;
 
 namespace StatSystem
 {
-public abstract class ModifiersOperations : IModifiersOperations
+public abstract class ModifiersOperationsBase : IModifiersOperations
 {
    protected readonly List<Modifier> Modifiers;
 
-   protected ModifiersOperations() => Modifiers = new List<Modifier>();
-
-   protected ModifiersOperations(int capacity) => Modifiers = new List<Modifier>(capacity);
+   protected ModifiersOperationsBase(int capacity) => Modifiers = new List<Modifier>(capacity);
 
    public virtual void AddModifier(Modifier modifier)
    {
@@ -28,7 +26,7 @@ public abstract class ModifiersOperations : IModifiersOperations
    {
 #if UNITY_EDITOR
       if(modifiersList.Count == modifiersList.Capacity)
-         Debug.LogWarning($"Resize of {type} modifiers List! Consider initializing the list with higher capacity.");
+         Debug.LogWarning($"Resize of {type} modifiers List! Consider initializing the list with a higher capacity.");
 #endif
    }
 }

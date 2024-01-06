@@ -1,18 +1,21 @@
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace StatSystem
 {
+[Serializable]
 public sealed class Stat
 {
    private const int DEFAULT_LIST_CAPACITY = 4;
    private const int DEFAULT_DIGIT_ACCURACY = 2;
-
+   internal const int MAXIMUM_ROUND_DIGITS = 8;
+   
    public float BaseValue {
-      get => _baseValue;
+      get => baseValue;
       set
       {
-         _baseValue = value;
+         baseValue = value;
          _currentValue = CalculateModifiedValue(_digitAccuracy);
          OnValueChanged();
       }
@@ -22,13 +25,12 @@ public sealed class Stat
    {
       get
       {
-         List<Modifier> modifiersOperationsList = new();
-         foreach (var modifierType in _modifiersOperations.Keys)
-         {
-            modifiersOperationsList.AddRange(_modifiersOperations[modifierType].GetAllModifiers());
-         }
+         _modifiersList.Clear();
+         
+         foreach (var modifiersOperation in _modifiersOperations.Values)
+            _modifiersList.AddRange(modifiersOperation.GetAllModifiers());
 
-         return modifiersOperationsList;
+         return _modifiersList;
       }
    }
 
@@ -44,7 +46,6 @@ public sealed class Stat
             _currentValue = CalculateModifiedValue(_digitAccuracy);
             OnValueChanged();
          }
-
          return _currentValue;
       }
    }
@@ -59,19 +60,18 @@ public sealed class Stat
             OnModifiersChanged();
       }
    }
-   
-   private const int MAXIMUM_ROUND_DIGITS = 8;
 
-   private readonly Dictionary<ModifierType, IModifiersOperations> _modifiersOperations = new();
+   [SerializeField] private float baseValue;
    
-   private float _baseValue;
+   private readonly SortedList<ModifierType, IModifiersOperations> _modifiersOperations = new();
+   private readonly List<Modifier> _modifiersList = new();
    private float _currentValue;
    private bool _isDirty;
    private readonly int _digitAccuracy;
-   
+
    public Stat(float baseValue, int digitAccuracy, int modsMaxCapacity)
    {
-      _baseValue = baseValue;
+      this.baseValue = baseValue;
       _currentValue = baseValue;
       _digitAccuracy = digitAccuracy;
 
@@ -91,17 +91,26 @@ public sealed class Stat
    public bool TryRemoveAllModifiersOf(object source)
    {
       bool isRemoved = false;
-      
-      foreach (var modifierType in _modifiersOperations)
-         isRemoved = isRemoved || TryRemoveAllModifiersOfSourceFromList(source, modifierType.Value.GetAllModifiers());
+
+      for (int i = 0; i < _modifiersOperations.Count; i++)
+         isRemoved = TryRemoveAllModifiersOfSourceFromList(source, 
+                     _modifiersOperations.Values[i].GetAllModifiers()) || isRemoved;
 
       return isRemoved;
    }
 
+   private void InitializeModifierOperations(int capacity)
+   {
+      var modifierOperations = ModifierOperationsFactory.GetModifierOperations(capacity);
+      
+      foreach (var operationType in modifierOperations.Keys)
+         _modifiersOperations[operationType] = modifierOperations[operationType]();
+   }
+   
    private bool TryRemoveAllModifiersOfSourceFromList(object source, List<Modifier> listOfModifiers)
    {
       bool isModifierRemoved = false;
-      
+
       for (var i = listOfModifiers.Count - 1; i >= 0; i--)
       {
          if (ReferenceEquals(source, listOfModifiers[i].Source))
@@ -111,18 +120,9 @@ public sealed class Stat
             isModifierRemoved = true;
          }
       }
-
       return isModifierRemoved;
    }
 
-   private void InitializeModifierOperations(int capacity)
-   {
-      var modifierOperations = ModifierOperationsFactory.GetModifierOperations(capacity);
-      
-      foreach (var operationType in modifierOperations.Keys)
-         _modifiersOperations.Add(operationType, modifierOperations[operationType]());
-   }
-   
    private void OnValueChanged() => ValueChanged?.Invoke();
    private void OnModifiersChanged() => ModifiersChanged?.Invoke();
    
@@ -130,12 +130,10 @@ public sealed class Stat
    {
       digitAccuracy = Math.Clamp(digitAccuracy, 0, MAXIMUM_ROUND_DIGITS);
 
-      float finalValue = _baseValue;
+      float finalValue = baseValue;
 
-      foreach (var modifiersOperation in _modifiersOperations.Values)
-      {
-         finalValue += modifiersOperation.CalculateModifiersValue(_baseValue, finalValue);
-      }
+      for (int i = 0; i < _modifiersOperations.Count; i++)
+         finalValue += _modifiersOperations.Values[i].CalculateModifiersValue(baseValue, finalValue);
 
       IsDirty = false;
 

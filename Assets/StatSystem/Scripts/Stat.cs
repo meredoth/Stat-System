@@ -1,13 +1,40 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using Debug = UnityEngine.Debug;
 
 namespace StatSystem
 {
 public sealed class Stat
 {
+   private const int DEFAULT_LIST_CAPACITY = 4;
+   private const int DEFAULT_DIGIT_ACCURACY = 2;
+
+   public float BaseValue {
+      get => _baseValue;
+      set
+      {
+         _baseValue = value;
+         _currentValue = CalculateModifiedValue(_digitAccuracy);
+         OnValueChanged();
+      }
+   }
+
+   public IReadOnlyList<Modifier> Modifiers
+   {
+      get
+      {
+         List<Modifier> modifiersOperationsList = new();
+         foreach (var modifierType in _modifiersOperations.Keys)
+         {
+            modifiersOperationsList.AddRange(_modifiersOperations[modifierType].GetAllModifiers());
+         }
+
+         return modifiersOperationsList;
+      }
+   }
+
+   public event Action ValueChanged;
+   public event Action ModifiersChanged;
+   
    public float Value
    {
       get
@@ -21,21 +48,7 @@ public sealed class Stat
          return _currentValue;
       }
    }
-
-   public float BaseValue {
-      get => _baseValue;
-      set
-      {
-         _baseValue = value;
-         _currentValue = CalculateModifiedValue(_digitAccuracy);
-         OnValueChanged();
-      }
-   }
-
-   public (IReadOnlyList<Modifier> FlatModifiers, IReadOnlyList<Modifier> AdditiveModifiers, IReadOnlyList<Modifier>
-      MultiplicativeModifiers) Modifiers =>
-      (_flatModifiers.AsReadOnly(), _additivePercentageModifiers.AsReadOnly(), _multiplicativePercentageModifiers.AsReadOnly());
-
+   
    private bool IsDirty
    {
       get => _isDirty;
@@ -46,138 +59,45 @@ public sealed class Stat
             OnModifiersChanged();
       }
    }
-
-   // Gets raised only when the value is calculated with the available modifiers,
-   // NOT whenever a modifier id added/removed.
-   public event Action ValueChanged;
-   public event Action ModifiersChanged;
    
    private const int MAXIMUM_ROUND_DIGITS = 8;
 
-   private readonly List<Modifier> _flatModifiers;
-   private readonly List<Modifier> _additivePercentageModifiers;
-   private readonly List<Modifier> _multiplicativePercentageModifiers;
-
+   private readonly Dictionary<ModifierType, IModifiersOperations> _modifiersOperations = new();
+   
    private float _baseValue;
    private float _currentValue;
    private bool _isDirty;
    private readonly int _digitAccuracy;
    
-   public Stat(float baseValue, int digitAccuracy, int flatModsMaxCapacity, int additiveModsMaxCapacity, int multiplicativeModsMaxCapacity)
+   public Stat(float baseValue, int digitAccuracy, int modsMaxCapacity)
    {
       _baseValue = baseValue;
       _currentValue = baseValue;
       _digitAccuracy = digitAccuracy;
-      
-      _flatModifiers = new List<Modifier>(flatModsMaxCapacity);
-      _additivePercentageModifiers = new List<Modifier>(additiveModsMaxCapacity);
-      _multiplicativePercentageModifiers = new List<Modifier>(multiplicativeModsMaxCapacity);
+
+      InitializeModifierOperations(modsMaxCapacity);
    }
-   public Stat(float baseValue) : this(baseValue, 4, 4, 4, 4) { }
-   public Stat(float baseValue, int digitAccuracy) : this(baseValue, digitAccuracy, 4, 4, 4) { }
+   public Stat(float baseValue) : this(baseValue, DEFAULT_DIGIT_ACCURACY, DEFAULT_LIST_CAPACITY) { }
+   public Stat(float baseValue, int digitAccuracy) : this(baseValue, digitAccuracy, DEFAULT_LIST_CAPACITY) { }
 
    public void AddModifier(Modifier modifier)
    {
       IsDirty = true;
-      
-      switch (modifier.Type)
-      {
-         case ModifierType.Flat:
-            CheckListCapacity(_flatModifiers);
-            _flatModifiers.Add(modifier);
-            break;
-         case ModifierType.Additive:
-            CheckListCapacity(_additivePercentageModifiers);
-            _additivePercentageModifiers.Add(modifier);
-            break;
-         case ModifierType.Multiplicative:
-            CheckListCapacity(_multiplicativePercentageModifiers);
-            _multiplicativePercentageModifiers.Add(modifier);
-            break;
-         default:
-            throw new ArgumentOutOfRangeException();
-      }
+      _modifiersOperations[modifier.Type].AddModifier(modifier);
    }
 
-   public bool TryRemoveModifier(Modifier modifier)
+   public bool TryRemoveModifier(Modifier modifier) => IsDirty = _modifiersOperations[modifier.Type].TryRemoveModifier(modifier);
+
+   public bool TryRemoveAllModifiersOf(object source)
    {
-      return modifier.Type switch
-      {
-         ModifierType.Flat => TryRemoveModifierFromList(modifier, _flatModifiers),
-         ModifierType.Additive => TryRemoveModifierFromList(modifier, _additivePercentageModifiers),
-         ModifierType.Multiplicative => TryRemoveModifierFromList(modifier,
-            _multiplicativePercentageModifiers),
-         _ => throw new ArgumentOutOfRangeException()
-      };
+      bool isRemoved = false;
+      
+      foreach (var modifierType in _modifiersOperations)
+         isRemoved = isRemoved || TryRemoveAllModifiersOfSourceFromList(source, modifierType.Value.GetAllModifiers());
+
+      return isRemoved;
    }
 
-   public bool TryRemoveAllModifiersOf(object source) =>
-      TryRemoveAllModifiersOfSourceFromList(source, _flatModifiers) ||
-      TryRemoveAllModifiersOfSourceFromList(source, _additivePercentageModifiers) ||
-      TryRemoveAllModifiersOfSourceFromList(source, _multiplicativePercentageModifiers);
-
-   public static implicit operator float(Stat stat) => stat.Value;
-   
-   private float CalculateModifiedValue(int roundDigits)
-   {
-      roundDigits = Math.Clamp(roundDigits, 0, MAXIMUM_ROUND_DIGITS);
-      
-      float flatModsValue = CalculateFlatModsValue(_baseValue);
-      float additiveModsValue = CalculateAdditiveModsValue(_baseValue);
-      float finalValue = CalculateMultiplicativeModsValue(flatModsValue + additiveModsValue);
-
-      IsDirty = false;
-
-      return (float)Math.Round(finalValue, roundDigits);
-   }
-
-   private float CalculateFlatModsValue(float startingValue)
-   {
-      float calculatedValue = startingValue;
-      float flatModifiersSum = 0f;
-      
-      for (var i = 0; i < _flatModifiers.Count; i++)
-         flatModifiersSum += _flatModifiers[i];
-
-      calculatedValue += flatModifiersSum;
-
-      return calculatedValue;
-   }
-
-   private float CalculateAdditiveModsValue(float startingValue)
-   {
-      float calculatedValue = startingValue;
-      float additiveModifiersSum = 0f;
-      
-      for (var i = 0; i < _additivePercentageModifiers.Count; i++)
-         additiveModifiersSum += _additivePercentageModifiers[i];
-
-      calculatedValue += _baseValue * (1 + additiveModifiersSum);
-      
-      return calculatedValue;
-   }
-
-   private float CalculateMultiplicativeModsValue(float startingValue)
-   {
-      float calculatedValue = startingValue;
-      
-      for (var i = 0; i < _multiplicativePercentageModifiers.Count; i++)
-         calculatedValue *= 1 + _multiplicativePercentageModifiers[i];
-
-      return calculatedValue;
-   }
-
-   private bool TryRemoveModifierFromList(Modifier modifier, List<Modifier> listOfModifiers)
-   {
-      if (listOfModifiers.Remove(modifier))
-      {
-         IsDirty = true;
-         return true;
-      }
-      
-      return false;
-   }
-   
    private bool TryRemoveAllModifiersOfSourceFromList(object source, List<Modifier> listOfModifiers)
    {
       bool isModifierRemoved = false;
@@ -195,16 +115,31 @@ public sealed class Stat
       return isModifierRemoved;
    }
 
+   private void InitializeModifierOperations(int capacity)
+   {
+      var modifierOperations = ModifierOperationsFactory.GetModifierOperations(capacity);
+      
+      foreach (var operationType in modifierOperations.Keys)
+         _modifiersOperations.Add(operationType, modifierOperations[operationType]());
+   }
+   
    private void OnValueChanged() => ValueChanged?.Invoke();
    private void OnModifiersChanged() => ModifiersChanged?.Invoke();
-
-   [Conditional("UNITY_EDITOR")]
-   private static void CheckListCapacity(List<Modifier> modifiersList, [CallerArgumentExpression("modifiersList")] string name = null)
+   
+   private float CalculateModifiedValue(int digitAccuracy)
    {
-#if UNITY_EDITOR
-      if(modifiersList.Count == modifiersList.Capacity)
-         Debug.LogWarning($"Resize of {name} List! Consider initializing the list with higher capacity.");
-#endif
+      digitAccuracy = Math.Clamp(digitAccuracy, 0, MAXIMUM_ROUND_DIGITS);
+
+      float finalValue = _baseValue;
+
+      foreach (var modifiersOperation in _modifiersOperations.Values)
+      {
+         finalValue += modifiersOperation.CalculateModifiersValue(_baseValue, finalValue);
+      }
+
+      IsDirty = false;
+
+      return (float)Math.Round(finalValue, digitAccuracy);
    }
 }
 }

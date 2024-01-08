@@ -10,16 +10,26 @@ public sealed class Stat
    private const int DEFAULT_LIST_CAPACITY = 4;
    private const int DEFAULT_DIGIT_ACCURACY = 2;
    internal const int MAXIMUM_ROUND_DIGITS = 8;
-   
-   public float BaseValue {
-      get => baseValue;
-      set
-      {
-         baseValue = value;
-         _currentValue = CalculateModifiedValue(_digitAccuracy);
-         OnValueChanged();
-      }
+
+   [SerializeField] private float baseValue;
+   private readonly int _digitAccuracy;
+   private readonly List<Modifier> _modifiersList = new();
+
+   private readonly SortedList<ModifierType, IModifiersOperations> _modifiersOperations = new();
+   private float _currentValue;
+   private bool _isDirty;
+
+   public Stat(float baseValue, int digitAccuracy, int modsMaxCapacity)
+   {
+      this.baseValue = baseValue;
+      _currentValue = baseValue;
+      _digitAccuracy = digitAccuracy;
+
+      InitializeModifierOperations(modsMaxCapacity);
    }
+
+   public Stat(float baseValue) : this(baseValue, DEFAULT_DIGIT_ACCURACY, DEFAULT_LIST_CAPACITY) { }
+   public Stat(float baseValue, int digitAccuracy) : this(baseValue, digitAccuracy, DEFAULT_LIST_CAPACITY) { }
 
    public IReadOnlyList<Modifier> Modifiers
    {
@@ -34,9 +44,16 @@ public sealed class Stat
       }
    }
 
-   public event Action ValueChanged;
-   public event Action ModifiersChanged;
-   
+   public float BaseValue {
+      get => baseValue;
+      set
+      {
+         baseValue = value;
+         _currentValue = CalculateModifiedValue(_digitAccuracy);
+         OnValueChanged();
+      }
+   }
+
    public float Value
    {
       get
@@ -49,7 +66,7 @@ public sealed class Stat
          return _currentValue;
       }
    }
-   
+
    private bool IsDirty
    {
       get => _isDirty;
@@ -61,24 +78,8 @@ public sealed class Stat
       }
    }
 
-   [SerializeField] private float baseValue;
-   
-   private readonly SortedList<ModifierType, IModifiersOperations> _modifiersOperations = new();
-   private readonly List<Modifier> _modifiersList = new();
-   private float _currentValue;
-   private bool _isDirty;
-   private readonly int _digitAccuracy;
-
-   public Stat(float baseValue, int digitAccuracy, int modsMaxCapacity)
-   {
-      this.baseValue = baseValue;
-      _currentValue = baseValue;
-      _digitAccuracy = digitAccuracy;
-
-      InitializeModifierOperations(modsMaxCapacity);
-   }
-   public Stat(float baseValue) : this(baseValue, DEFAULT_DIGIT_ACCURACY, DEFAULT_LIST_CAPACITY) { }
-   public Stat(float baseValue, int digitAccuracy) : this(baseValue, digitAccuracy, DEFAULT_LIST_CAPACITY) { }
+   public event Action ValueChanged;
+   public event Action ModifiersChanged;
 
    public void AddModifier(Modifier modifier)
    {
@@ -98,6 +99,20 @@ public sealed class Stat
 
       return isRemoved;
    }
+   
+   private float CalculateModifiedValue(int digitAccuracy)
+   {
+      digitAccuracy = Math.Clamp(digitAccuracy, 0, MAXIMUM_ROUND_DIGITS);
+
+      float finalValue = baseValue;
+
+      for (int i = 0; i < _modifiersOperations.Count; i++)
+         finalValue += _modifiersOperations.Values[i].CalculateModifiersValue(baseValue, finalValue);
+
+      IsDirty = false;
+
+      return (float)Math.Round(finalValue, digitAccuracy);
+   }
 
    private void InitializeModifierOperations(int capacity)
    {
@@ -106,7 +121,7 @@ public sealed class Stat
       foreach (var operationType in modifierOperations.Keys)
          _modifiersOperations[operationType] = modifierOperations[operationType]();
    }
-   
+
    private bool TryRemoveAllModifiersOfSourceFromList(object source, List<Modifier> listOfModifiers)
    {
       bool isModifierRemoved = false;
@@ -125,19 +140,5 @@ public sealed class Stat
 
    private void OnValueChanged() => ValueChanged?.Invoke();
    private void OnModifiersChanged() => ModifiersChanged?.Invoke();
-   
-   private float CalculateModifiedValue(int digitAccuracy)
-   {
-      digitAccuracy = Math.Clamp(digitAccuracy, 0, MAXIMUM_ROUND_DIGITS);
-
-      float finalValue = baseValue;
-
-      for (int i = 0; i < _modifiersOperations.Count; i++)
-         finalValue += _modifiersOperations.Values[i].CalculateModifiersValue(baseValue, finalValue);
-
-      IsDirty = false;
-
-      return (float)Math.Round(finalValue, digitAccuracy);
-   }
 }
 }

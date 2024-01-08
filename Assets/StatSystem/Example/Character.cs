@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace StatSystem.Example
 {
-
 public sealed class MultiplicativeModifiersOperations : ModifiersOperationsBase
 {
     internal MultiplicativeModifiersOperations(int capacity) : base(capacity) { }

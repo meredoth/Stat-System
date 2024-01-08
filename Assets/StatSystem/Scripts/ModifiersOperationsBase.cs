@@ -20,7 +20,7 @@ public abstract class ModifiersOperationsBase : IModifiersOperations
    public virtual List<Modifier> GetAllModifiers() => Modifiers;
 
    public abstract float CalculateModifiersValue(float baseValue, float currentValue);
-   
+
    [Conditional("UNITY_EDITOR")]
    private static void CheckListCapacity(List<Modifier> modifiersList, ModifierType type)
    {

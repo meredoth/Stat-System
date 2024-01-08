@@ -2,13 +2,34 @@ using UnityEngine;
 
 namespace StatSystem.Example
 {
+
+public sealed class MultiplicativeModifiersOperations : ModifiersOperationsBase
+{
+    internal MultiplicativeModifiersOperations(int capacity) : base(capacity) { }
+   
+    public override float CalculateModifiersValue(float baseValue, float currentValue)
+    {
+        float calculatedValue = currentValue;
+
+        for (var i = 0; i < Modifiers.Count; i++)
+            calculatedValue += calculatedValue *  Modifiers[i];
+
+        return calculatedValue - currentValue;
+    }
+}
+
 public class Character : MonoBehaviour
 {
-    [SerializeField] private Stat strength = new(100);
-    [SerializeField] private Stat dexterity = new(50);
+    [SerializeField] private Stat strength;
+    [SerializeField] private Stat dexterity;
     
     void Start()
     {
+        ModifierOperationsCollection.AddModifierOperation(ModifierType.Multiplicative, () => new MultiplicativeModifiersOperations(4));
+        
+        strength = new Stat(100);
+        dexterity = new Stat(50);
+        
         Modifier mod1 = new Modifier(20, ModifierType.Flat, this);
         Modifier mod2 = new Modifier(0.1f, ModifierType.Additive, this);
         Modifier mod3 = new Modifier(0.2f, ModifierType.Multiplicative);

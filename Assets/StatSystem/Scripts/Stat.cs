@@ -101,7 +101,7 @@ public sealed class Stat
 
    private void InitializeModifierOperations(int capacity)
    {
-      var modifierOperations = ModifierOperationsFactory.GetModifierOperations(capacity);
+      var modifierOperations = ModifierOperationsCollection.GetModifierOperations(capacity);
       
       foreach (var operationType in modifierOperations.Keys)
          _modifiersOperations[operationType] = modifierOperations[operationType]();

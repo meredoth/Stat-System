@@ -1,21 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using UnityEngine;
 
 namespace StatSystem
 {
-public static class ModifierOperationsFactory
+public static class ModifierOperationsCollection
 {
    private static readonly Dictionary<ModifierType, Func<IModifiersOperations>> ModifierOperationsDict;
-   // ReSharper disable once InconsistentNaming
+   
    [SuppressMessage("NDepend", "ND1901:AvoidNonReadOnlyStaticFields", Justification="AddModifierOperation cannot run after GetModifierOperations")]
    private static bool _IsInitialized;
    
-   static ModifierOperationsFactory()
-   {
-      ModifierOperationsDict = new Dictionary<ModifierType, Func<IModifiersOperations>>();
-   }
-   
+   static ModifierOperationsCollection() => ModifierOperationsDict = new Dictionary<ModifierType, Func<IModifiersOperations>>();
+
    private sealed class FlatModifiersOperations : ModifiersOperationsBase
    {
       internal FlatModifiersOperations(int capacity) : base(capacity) { }
@@ -66,6 +64,9 @@ public static class ModifierOperationsFactory
       if (_IsInitialized)
          throw new InvalidOperationException(
             "Add any modifier operations before any initialization of the Stat class!");
+
+      if (modifierType is ModifierType.Flat or ModifierType.Additive or ModifierType.Multiplicative)
+         Debug.LogWarning("modifier operations for types flat, additive and multiplicative cannot be changed! Default operations for these types will be used.");
       
       ModifierOperationsDict[modifierType] = modifierOperationsDelegate;
    }

@@ -7,6 +7,7 @@ namespace StatSystem
 {
 public static class ModifierOperationsCollection
 {
+   [SuppressMessage("NDepend", "ND1901:AvoidNonReadOnlyStaticFields", Justification="Unity need this in an Init method for Domain Reload Disable")]
    private static Dictionary<ModifierType, Func<IModifiersOperations>> _ModifierOperationsDict;
 
    [SuppressMessage("NDepend", "ND1901:AvoidNonReadOnlyStaticFields", Justification="AddModifierOperation cannot run after GetModifierOperations")]
@@ -35,18 +36,18 @@ public static class ModifierOperationsCollection
 
    internal static Dictionary<ModifierType, Func<IModifiersOperations>> GetModifierOperations(int capacity)
    {
-      _ModifierOperationsDict[ModifierType.Flat] = () => new FlatModifiersOperations(capacity);
-      _ModifierOperationsDict[ModifierType.Additive] = () => new AdditiveModifiersOperations(capacity);
-      _ModifierOperationsDict[ModifierType.Multiplicative] = () => new MultiplicativeModifiersOperations(capacity);
+      _ModifierOperationsDict[ModifierType.Flat] = () => new FlatModifierOperations(capacity);
+      _ModifierOperationsDict[ModifierType.Additive] = () => new AdditiveModifierOperations(capacity);
+      _ModifierOperationsDict[ModifierType.Multiplicative] = () => new MultiplicativeModifierOperations(capacity);
 
       _IsInitialized = true;
       
       return _ModifierOperationsDict;
    }
 
-   private sealed class FlatModifiersOperations : ModifiersOperationsBase
+   private sealed class FlatModifierOperations : ModifierOperationsBase
    {
-      internal FlatModifiersOperations(int capacity) : base(capacity) { }
+      internal FlatModifierOperations(int capacity) : base(capacity) { }
 
       public override float CalculateModifiersValue(float baseValue, float currentValue)
       {
@@ -59,9 +60,9 @@ public static class ModifierOperationsCollection
       }
    }
 
-   private sealed class AdditiveModifiersOperations : ModifiersOperationsBase
+   private sealed class AdditiveModifierOperations : ModifierOperationsBase
    {
-      internal AdditiveModifiersOperations(int capacity) : base(capacity) { }
+      internal AdditiveModifierOperations(int capacity) : base(capacity) { }
 
       public override float CalculateModifiersValue(float baseValue, float currentValue)
       {
@@ -74,9 +75,9 @@ public static class ModifierOperationsCollection
       }
    }
 
-   private sealed class MultiplicativeModifiersOperations : ModifiersOperationsBase
+   private sealed class MultiplicativeModifierOperations : ModifierOperationsBase
    {
-      internal MultiplicativeModifiersOperations(int capacity) : base(capacity) { }
+      internal MultiplicativeModifierOperations(int capacity) : base(capacity) { }
 
       public override float CalculateModifiersValue(float baseValue, float currentValue)
       {

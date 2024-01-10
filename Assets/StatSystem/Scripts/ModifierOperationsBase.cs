@@ -4,11 +4,11 @@ using Debug = UnityEngine.Debug;
 
 namespace StatSystem
 {
-public abstract class ModifiersOperationsBase : IModifiersOperations
+public abstract class ModifierOperationsBase : IModifiersOperations
 {
    protected readonly List<Modifier> Modifiers;
 
-   protected ModifiersOperationsBase(int capacity) => Modifiers = new List<Modifier>(capacity);
+   protected ModifierOperationsBase(int capacity) => Modifiers = new List<Modifier>(capacity);
 
    public virtual void AddModifier(Modifier modifier)
    {

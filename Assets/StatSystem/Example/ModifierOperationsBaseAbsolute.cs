@@ -2,7 +2,7 @@
 
 namespace StatSystem.Example
 {
-public class ModifierOperationsBaseAbsolute : ModifiersOperationsBase
+public class ModifierOperationsBaseAbsolute : ModifierOperationsBase
 {
    public ModifierOperationsBaseAbsolute(int capacity) : base(capacity) { }
 

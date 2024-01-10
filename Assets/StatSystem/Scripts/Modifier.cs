@@ -19,12 +19,11 @@ public readonly struct Modifier
       Source = source;
    }
 
-   public override bool Equals(Object obj) => obj is Modifier modifier && this == modifier;
+   public override bool Equals(object obj) => obj is Modifier modifier && this == modifier;
 
    public override int GetHashCode() => Tuple.Create(Type, Value).GetHashCode();
 
-   public static bool operator ==(Modifier first, Modifier second) 
-      => first.Type == second.Type && 
+   public static bool operator ==(Modifier first, Modifier second) => first.Type == second.Type && 
          Math.Abs(first.Value - second.Value) < EPSILON && 
          ReferenceEquals(first.Source, second.Source);
    

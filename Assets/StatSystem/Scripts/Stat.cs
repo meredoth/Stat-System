@@ -87,7 +87,8 @@ public sealed class Stat
       _modifiersOperations[modifier.Type].AddModifier(modifier);
    }
 
-   public bool TryRemoveModifier(Modifier modifier) => IsDirty = _modifiersOperations[modifier.Type].TryRemoveModifier(modifier);
+   public bool TryRemoveModifier(Modifier modifier) => 
+      IsDirty = _modifiersOperations[modifier.Type].TryRemoveModifier(modifier) || IsDirty;
 
    public bool TryRemoveAllModifiersOf(object source)
    {

@@ -30,14 +30,14 @@ public class Character : MonoBehaviour
         strength.AddModifier(mod1); // 244.8
         strength.AddModifier(mod1); 
         strength.AddModifier(mod1); // 302.4
-        strength.AddModifier(baseReduction); // 60
+        //strength.AddModifier(baseReduction); // 60
         
 
         Debug.Log($"Strength value: {strength.Value}");
         strength.TryRemoveModifier(mod1);
         strength.TryRemoveModifier(mod3); //228
-        strength.TryRemoveModifier(baseReduction);
-        Debug.Log($"Strength value: {strength.Value}");
+        var foo = strength.TryRemoveModifier(baseReduction);
+        Debug.Log($"{foo} Strength value: {strength.Value}");
         strength.TryRemoveAllModifiersOf(this); // 120
 
         dexterity.AddModifier(mod1);

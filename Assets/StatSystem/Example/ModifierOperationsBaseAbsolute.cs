@@ -5,6 +5,7 @@ namespace StatSystem.Example
 public class ModifierOperationsBaseAbsolute : ModifierOperationsBase
 {
    public ModifierOperationsBaseAbsolute(int capacity) : base(capacity) { }
+   public ModifierOperationsBaseAbsolute() { }
 
    public override float CalculateModifiersValue(float baseValue, float currentValue)
    {

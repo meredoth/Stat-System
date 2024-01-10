@@ -9,6 +9,7 @@ public abstract class ModifierOperationsBase : IModifiersOperations
    protected readonly List<Modifier> Modifiers;
 
    protected ModifierOperationsBase(int capacity) => Modifiers = new List<Modifier>(capacity);
+   protected ModifierOperationsBase() => Modifiers = new List<Modifier>(4);
 
    public virtual void AddModifier(Modifier modifier)
    {

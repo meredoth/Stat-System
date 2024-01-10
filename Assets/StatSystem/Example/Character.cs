@@ -11,7 +11,7 @@ public class Character : MonoBehaviour
     {
         
         ModifierOperationsCollection.AddModifierOperation(BASE_ABSOLUTE,
-            () => new ModifierOperationsBaseAbsolute(4));
+            () => new ModifierOperationsBaseAbsolute());
         
         strength = new Stat(100);
         dexterity = new Stat(50);

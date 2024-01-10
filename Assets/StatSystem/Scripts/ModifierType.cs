@@ -5,6 +5,7 @@ public enum ModifierType
 {
    Flat,
    Additive,
-   Multiplicative
+   Multiplicative,
+   BaseReduction
 }
 }

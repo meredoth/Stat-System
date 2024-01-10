@@ -7,13 +7,20 @@ namespace StatSystem
 {
 public static class ModifierOperationsCollection
 {
-   private static readonly Dictionary<ModifierType, Func<IModifiersOperations>> _ModifierOperationsDict;
+   private static Dictionary<ModifierType, Func<IModifiersOperations>> _ModifierOperationsDict;
 
    [SuppressMessage("NDepend", "ND1901:AvoidNonReadOnlyStaticFields", Justification="AddModifierOperation cannot run after GetModifierOperations")]
    private static bool _IsInitialized;
 
-   static ModifierOperationsCollection() => _ModifierOperationsDict = new Dictionary<ModifierType, Func<IModifiersOperations>>();
+   static ModifierOperationsCollection() => Init();
 
+   [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+   private static void Init() // Initializing static variables for Unity's Disable Domain Reload
+   {
+      _IsInitialized = false;
+      _ModifierOperationsDict = new Dictionary<ModifierType, Func<IModifiersOperations>>();
+   }
+   
    public static void AddModifierOperation(ModifierType modifierType, Func<IModifiersOperations> modifierOperationsDelegate)
    {
       if (_IsInitialized)

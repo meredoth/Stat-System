@@ -87,18 +87,28 @@ public sealed class Stat
       _modifiersOperations[modifier.Type].AddModifier(modifier);
    }
 
-   public bool TryRemoveModifier(Modifier modifier) => 
-      IsDirty = _modifiersOperations[modifier.Type].TryRemoveModifier(modifier) || IsDirty;
+   public bool TryRemoveModifier(Modifier modifier)
+   {
+      var isModifierRemoved = false;
+
+      if (_modifiersOperations[modifier.Type].TryRemoveModifier(modifier))
+      {
+         IsDirty = true;
+         isModifierRemoved = true;
+      }
+
+      return isModifierRemoved;
+   }
 
    public bool TryRemoveAllModifiersOf(object source)
    {
-      bool isRemoved = false;
+      bool isModifierRemoved = false;
 
       for (int i = 0; i < _modifiersOperations.Count; i++)
-         isRemoved = TryRemoveAllModifiersOfSourceFromList(source, 
-                     _modifiersOperations.Values[i].GetAllModifiers()) || isRemoved;
+         isModifierRemoved = TryRemoveAllModifiersOfSourceFromList(source, 
+                     _modifiersOperations.Values[i].GetAllModifiers()) || isModifierRemoved;
 
-      return isRemoved;
+      return isModifierRemoved;
    }
    
    private float CalculateModifiedValue(int digitAccuracy)
@@ -136,6 +146,7 @@ public sealed class Stat
             isModifierRemoved = true;
          }
       }
+      
       return isModifierRemoved;
    }
 

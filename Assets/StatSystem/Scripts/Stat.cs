@@ -31,19 +31,6 @@ public sealed class Stat
    public Stat(float baseValue) : this(baseValue, DEFAULT_DIGIT_ACCURACY, DEFAULT_LIST_CAPACITY) { }
    public Stat(float baseValue, int digitAccuracy) : this(baseValue, digitAccuracy, DEFAULT_LIST_CAPACITY) { }
 
-   public IReadOnlyList<Modifier> Modifiers
-   {
-      get
-      {
-         _modifiersList.Clear();
-         
-         foreach (var modifiersOperation in _modifiersOperations.Values)
-            _modifiersList.AddRange(modifiersOperation.GetAllModifiers());
-
-         return _modifiersList;
-      }
-   }
-
    public float BaseValue {
       get => baseValue;
       set
@@ -87,6 +74,19 @@ public sealed class Stat
       _modifiersOperations[modifier.Type].AddModifier(modifier);
    }
 
+   public IReadOnlyList<Modifier> GetModifiers()
+   {
+      _modifiersList.Clear();
+         
+      foreach (var modifiersOperation in _modifiersOperations.Values)
+         _modifiersList.AddRange(modifiersOperation.GetAllModifiers());
+
+      return _modifiersList.AsReadOnly();
+   }
+   
+   public IReadOnlyList<Modifier> GetModifiers(ModifierType modifierType) 
+      => _modifiersOperations[modifierType].GetAllModifiers().AsReadOnly();
+
    public bool TryRemoveModifier(Modifier modifier)
    {
       var isModifierRemoved = false;
@@ -106,7 +106,7 @@ public sealed class Stat
 
       for (int i = 0; i < _modifiersOperations.Count; i++)
          isModifierRemoved = TryRemoveAllModifiersOfSourceFromList(source, 
-                     _modifiersOperations.Values[i].GetAllModifiers()) || isModifierRemoved;
+                             _modifiersOperations.Values[i].GetAllModifiers()) || isModifierRemoved;
 
       return isModifierRemoved;
    }

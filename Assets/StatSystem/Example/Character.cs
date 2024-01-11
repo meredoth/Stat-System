@@ -31,7 +31,6 @@ public class Character : MonoBehaviour
         strength.AddModifier(mod1); 
         strength.AddModifier(mod1); // 302.4
         strength.AddModifier(baseReduction); // 60
-        
 
         Debug.Log($"Strength value: {strength.Value}");
         strength.TryRemoveModifier(mod1);

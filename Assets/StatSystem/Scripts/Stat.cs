@@ -31,7 +31,8 @@ public sealed class Stat
    public Stat(float baseValue) : this(baseValue, DEFAULT_DIGIT_ACCURACY, DEFAULT_LIST_CAPACITY) { }
    public Stat(float baseValue, int digitAccuracy) : this(baseValue, digitAccuracy, DEFAULT_LIST_CAPACITY) { }
 
-   public float BaseValue {
+   public float BaseValue 
+   {
       get => baseValue;
       set
       {

@@ -2,10 +2,10 @@
 
 namespace StatSystem.Example
 {
-public class ModifierOperationsBaseAbsolute : ModifierOperationsBase
+public class ModifierOperationsBaseAbsoluteReduction : ModifierOperationsBase
 {
-   public ModifierOperationsBaseAbsolute(int capacity) : base(capacity) { }
-   public ModifierOperationsBaseAbsolute() { }
+   public ModifierOperationsBaseAbsoluteReduction(int capacity) : base(capacity) { }
+   public ModifierOperationsBaseAbsoluteReduction() { }
 
    public override float CalculateModifiersValue(float baseValue, float currentValue)
    {

@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 
 namespace StatSystem.Tests
@@ -8,7 +10,7 @@ public class StatTests
     private Modifier _modifierFlat;
     private Modifier _modifierAdditive;
     private Modifier _modifierMultiplicative;
-    
+
     [SetUp]
     public void Setup()
     {
@@ -152,6 +154,23 @@ public class StatTests
         var areRemoved = _testStat.TryRemoveAllModifiersOf(obj);
         
         Assert.IsFalse(areRemoved);
+    }
+    
+    [Test]
+    public void AddNewModifier_AddModifierAfterInitialization_ThrowsInvalidOperationException()
+    {
+        Stat testStat = new Stat(100);
+        
+        Assert.Throws(typeof(InvalidOperationException),
+            delegate { Stat.AddNewModifier(400, () => new StubModifiersOperations()); });
+    }
+    
+    private class StubModifiersOperations : IModifiersOperations
+    {
+        public void AddModifier(Modifier modifier) => throw new NotImplementedException();
+        public bool TryRemoveModifier(Modifier modifier) => throw new NotImplementedException();
+        public List<Modifier> GetAllModifiers() => throw new NotImplementedException();
+        public float CalculateModifiersValue(float baseValue, float currentValue) => throw new NotImplementedException();
     }
 }
 }

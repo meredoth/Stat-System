@@ -5,7 +5,8 @@ public class Character : MonoBehaviour
 {
     [SerializeField] private Stat strength;
     [SerializeField] private Stat dexterity;
-    private const ModifierType BASE_ABSOLUTE = (ModifierType)400;
+
+    
 
     private readonly BootsOfSpeed _bootsOfSpeed = new();
     private readonly GlovesOfStrength _glovesOfStrength = new();
@@ -67,18 +68,15 @@ public class Character : MonoBehaviour
             DexterityModMulti = new Modifier(0.5f, ModifierType.Multiplicative, this);
         }
     }
-    
+
     void Start()
     {
-        ModifierOperationsCollection.AddModifierOperation(BASE_ABSOLUTE,
-            () => new ModifierOperationsBaseAbsoluteReduction());
-        
         strength = new Stat(100);
         dexterity = new Stat(50);
-
-        Modifier strengthCurse = new Modifier(0.2f, BASE_ABSOLUTE);
-        Modifier witchCurse = new Modifier(0.4f, BASE_ABSOLUTE);
         
+        Modifier strengthCurse = new Modifier(0.2f, Modifiers.BaseAbsolute);
+        Modifier witchCurse = new Modifier(0.4f, Modifiers.BaseAbsolute);
+
         Debug.Log($"Initial Strength: {strength.Value} and Dexterity: {dexterity.Value}");
 
         Debug.Log("Equipping boots of speed (-10% strength additive, 10 flat dexterity, 20% additive dexterity, 10% multiplicative dexterity)");

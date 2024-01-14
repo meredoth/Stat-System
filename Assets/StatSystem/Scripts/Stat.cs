@@ -14,11 +14,9 @@ public sealed class Stat
 
    [SerializeField] private float baseValue;
 
-   private static readonly ModifierOperationsCollection _ModifierOperationsCollection = new();
-
-   [SuppressMessage("NDepend", "ND1901:AvoidNonReadOnlyStaticFields", Justification = "Needed for calling InitStatics")]
-   [SuppressMessage("NDepend", "ND1211:DontAssignStaticFieldsFromInstanceMethods", Justification = "Needed for instance checking")]
-   private static bool _InstanceHasBeenCreated;
+   [SuppressMessage("NDepend", "ND1902:AvoidStaticFieldsWithAMutableFieldType", Justification="Cannot mutate after Instantiation of Stat, will throw.")]
+   [SuppressMessage("NDepend", "ND1901:AvoidNonReadOnlyStaticFields", Justification="Not readonly so that it can be called from Init() for reset.")]
+   private static ModifierOperationsCollection _ModifierOperationsCollection = new();
 
    private readonly int _digitAccuracy;
    private readonly List<Modifier> _modifiersList = new();
@@ -27,16 +25,15 @@ public sealed class Stat
    private float _currentValue;
    private bool _isDirty;
 
-   [SuppressMessage("NDepend", "ND1701:PotentiallyDeadMethods", Justification = "Needed for Unity's reset of static fields with disable domain reload feature")]
+   [SuppressMessage("NDepend", "ND1701:PotentiallyDeadMethods", Justification="Needed for Unity's disable domain reload feature.")]
    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-   private static void InitStatics() => _InstanceHasBeenCreated = false;
-
+   private static void Init() =>  _ModifierOperationsCollection = new();
+   
    public Stat(float baseValue, int digitAccuracy, int modsMaxCapacity)
    {
       this.baseValue = baseValue;
       _currentValue = baseValue;
       _digitAccuracy = digitAccuracy;
-      _InstanceHasBeenCreated = true;
 
       InitializeModifierOperations(modsMaxCapacity);
 
@@ -97,14 +94,16 @@ public sealed class Stat
       _modifiersOperations[modifier.Type].AddModifier(modifier);
    }
 
-   public static ModifierType AddNewModifier(int order,
-      Func<IModifiersOperations> modifierOperationsDelegate)
+   public static ModifierType NewModifierType(int order, Func<IModifiersOperations> modifierOperationsDelegate)
    {
-      if (_InstanceHasBeenCreated)
-         throw new InvalidOperationException(
-            "Add any modifier operations before any initialization of the Stat class!");
-
-      return _ModifierOperationsCollection.AddModifierOperation(order, modifierOperationsDelegate);
+      try
+      {
+         return _ModifierOperationsCollection.AddModifierOperation(order, modifierOperationsDelegate);
+      }
+      catch
+      {
+         throw new InvalidOperationException("Add any modifier operations before any initialization of the Stat class!");
+      }
    }
 
    public IReadOnlyList<Modifier> GetModifiers()
@@ -117,8 +116,7 @@ public sealed class Stat
       return _modifiersList.AsReadOnly();
    }
 
-   public IReadOnlyList<Modifier> GetModifiers(ModifierType modifierType)
-      => _modifiersOperations[modifierType].GetAllModifiers().AsReadOnly();
+   public IReadOnlyList<Modifier> GetModifiers(ModifierType modifierType) => _modifiersOperations[modifierType].GetAllModifiers().AsReadOnly();
 
    public bool TryRemoveModifier(Modifier modifier)
    {
@@ -187,17 +185,18 @@ public sealed class Stat
 
    private sealed class ModifierOperationsCollection
    {
-      private readonly Dictionary<ModifierType, Func<IModifiersOperations>> _modifierOperationsDict
-         = new();
-
-      internal ModifierType AddModifierOperation(int order,
-         Func<IModifiersOperations> modifierOperationsDelegate)
+      private readonly Dictionary<ModifierType, Func<IModifiersOperations>> _modifierOperationsDict = new();
+      private bool _modifiersCollectionHasBeenReturned;
+      
+      internal ModifierType AddModifierOperation(int order, Func<IModifiersOperations> modifierOperationsDelegate)
       {
+         if (_modifiersCollectionHasBeenReturned)
+            throw new InvalidOperationException("Cannot change collection after it has been returned");
+         
          var modifierType = (ModifierType)order;
 
          if (modifierType is ModifierType.Flat or ModifierType.Additive or ModifierType.Multiplicative)
-            Debug.LogWarning(
-               "modifier operations for types flat, additive and multiplicative cannot be changed! Default operations for these types will be used.");
+            Debug.LogWarning("modifier operations for types flat, additive and multiplicative cannot be changed! Default operations for these types will be used.");
 
          _modifierOperationsDict[modifierType] = modifierOperationsDelegate;
 
@@ -208,9 +207,10 @@ public sealed class Stat
       {
          _modifierOperationsDict[ModifierType.Flat] = () => new FlatModifierOperations(capacity);
          _modifierOperationsDict[ModifierType.Additive] = () => new AdditiveModifierOperations(capacity);
-         _modifierOperationsDict[ModifierType.Multiplicative]
-            = () => new MultiplicativeModifierOperations(capacity);
+         _modifierOperationsDict[ModifierType.Multiplicative] = () => new MultiplicativeModifierOperations(capacity);
 
+         _modifiersCollectionHasBeenReturned = true;
+         
          return _modifierOperationsDict;
       }
 

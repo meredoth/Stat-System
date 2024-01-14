@@ -5,19 +5,21 @@ public class Character : MonoBehaviour
 {
     [SerializeField] private Stat strength;
     [SerializeField] private Stat dexterity;
-    
+
     private readonly BootsOfSpeed _bootsOfSpeed = new();
     private readonly GlovesOfStrength _glovesOfStrength = new();
     private readonly EnchantedArmor _enchantedArmor = new();
     private readonly AmazingSword _amazingSword = new();
     private readonly WitchKillerAxe _witchKillerAxe = new();
+    private ModifierType _baseAbsoluteReduction;
 
     private class BootsOfSpeed
     {
-        public readonly Modifier DexterityModFlat; 
+        public readonly Modifier DexterityModFlat;
         public readonly Modifier DexterityModAdditive;
         public readonly Modifier StrengthModAdditive;
         public readonly Modifier DexterityModMulti;
+
         public BootsOfSpeed()
         {
             DexterityModFlat = new Modifier(10f, ModifierType.Flat, this);
@@ -30,7 +32,8 @@ public class Character : MonoBehaviour
     private class GlovesOfStrength
     {
         public readonly Modifier StrengthModAdditive;
-        public GlovesOfStrength() 
+
+        public GlovesOfStrength()
             => StrengthModAdditive = new Modifier(0.3f, ModifierType.Additive, this);
     }
 
@@ -38,10 +41,11 @@ public class Character : MonoBehaviour
     {
         public readonly Modifier StrengthModMulti;
         public readonly Modifier DexterityModMulti;
+
         public EnchantedArmor()
         {
-            StrengthModMulti  = new Modifier(0.1f, ModifierType.Multiplicative, this);
-            DexterityModMulti = new Modifier(0.3f, ModifierType.Multiplicative, this);    
+            StrengthModMulti = new Modifier(0.1f, ModifierType.Multiplicative, this);
+            DexterityModMulti = new Modifier(0.3f, ModifierType.Multiplicative, this);
         }
     }
 
@@ -49,6 +53,7 @@ public class Character : MonoBehaviour
     {
         public readonly Modifier StrengthModMulti;
         public readonly Modifier StrengthModFlat;
+
         public AmazingSword()
         {
             StrengthModMulti = new Modifier(0.2f, ModifierType.Multiplicative, this);
@@ -60,6 +65,7 @@ public class Character : MonoBehaviour
     {
         public readonly Modifier StrengthModMulti;
         public readonly Modifier DexterityModMulti;
+
         public WitchKillerAxe()
         {
             StrengthModMulti = new Modifier(-0.1f, ModifierType.Multiplicative, this);
@@ -67,13 +73,18 @@ public class Character : MonoBehaviour
         }
     }
 
+    private void Awake()
+    {
+        _baseAbsoluteReduction = Stat.NewModifierType(400, () => new ModifierOperationsBaseAbsoluteReduction());
+    }
+    
     void Start()
     {
         strength = new Stat(100);
         dexterity = new Stat(50);
         
-        Modifier strengthCurse = new Modifier(0.2f, Modifiers.BaseAbsolute);
-        Modifier witchCurse = new Modifier(0.4f, Modifiers.BaseAbsolute);
+        Modifier strengthCurse = new Modifier(0.2f, _baseAbsoluteReduction);
+        Modifier witchCurse = new Modifier(0.4f, _baseAbsoluteReduction);
 
         Debug.Log($"Initial Strength: {strength.Value} and Dexterity: {dexterity.Value}");
 

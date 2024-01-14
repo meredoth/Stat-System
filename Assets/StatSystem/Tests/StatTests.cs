@@ -162,7 +162,7 @@ public class StatTests
         Stat testStat = new Stat(100);
         
         Assert.Throws(typeof(InvalidOperationException),
-            delegate { Stat.AddNewModifier(400, () => new StubModifiersOperations()); });
+            delegate { Stat.NewModifierType(400, () => new StubModifiersOperations()); });
     }
     
     private class StubModifiersOperations : IModifiersOperations

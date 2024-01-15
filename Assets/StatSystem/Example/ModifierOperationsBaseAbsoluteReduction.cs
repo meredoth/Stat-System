@@ -9,12 +9,12 @@ public class ModifierOperationsBaseAbsoluteReduction : ModifierOperationsBase
 
    public override float CalculateModifiersValue(float baseValue, float currentValue)
    {
-      var biggestModifer = 0f;
+      var biggestModifier = 0f;
 
       for (var i = 0; i < Modifiers.Count; i++)
-         biggestModifer = Mathf.Max(biggestModifer, Modifiers[i]);
+         biggestModifier = Mathf.Max(biggestModifier, Modifiers[i]);
 
-      var modifierValue = biggestModifer == 0f ? 0f : baseValue * (1 - biggestModifer) - currentValue;
+      var modifierValue = biggestModifier == 0f ? 0f : baseValue * (1 - biggestModifier) - currentValue;
 
       return modifierValue;
    }

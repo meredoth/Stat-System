@@ -18,6 +18,7 @@ public abstract class ModifierOperationsBase : IModifiersOperations
    }
 
    public virtual bool TryRemoveModifier(Modifier modifier) => Modifiers.Remove(modifier);
+   
    public virtual List<Modifier> GetAllModifiers() => Modifiers;
 
    public abstract float CalculateModifiersValue(float baseValue, float currentValue);

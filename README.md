@@ -15,6 +15,7 @@ See the Example folder, for a simple how to use example.
 For the initial conception and the refactoring that led to the final code you can check my posts on my blog:
 
 [A Stat System for Unity part 1](https://giannisakritidis.com/blog/Stat-System-Part1/)
+
 [A Stat System for Unity part 2](https://giannisakritidis.com/blog/Stat-System-Part2/)
 
 ## Simple Usage
@@ -180,7 +181,7 @@ strength = new Stat(100, 2, 10);
 
 Here, the third parameter, is the initial size of the maximum number of modifiers of each type that is expected this stat to have at any one point. This parameter helps with avoiding the garbage collector. As each type of modifier has a List with the applied modifiers for the stat, the third parameter effectively initializes those lists with a default capacity.
 
-The initial default capacity of each list is 4. If at any point in time, a list resize is required, a warning will be showed, this won't affect the functionality of the Stat system in any way, it is just a convenient way to avoid the garbage collector during the addition of new modifiers to any of our stats in the game.
+The initial default capacity of each list is 4. If at any point in time, a list resize is required, a warning will be showed. This won't affect the functionality of the Stat system in any way, it is just a convenient way to avoid the garbage collector during the addition of new modifiers to any of our stats in the game.
 
 ## Getting the Modifiers of Each Stat
 

@@ -72,6 +72,8 @@ strength.TryRemoveAllModifiersOf(_amazingSword);
 
 ### Example
 
+The [Character.cs](Assets/StatSystem/Example/Character.cs) script, has an example of how to create items with modifiers, how to add/remove modifiers to/from stats and comments of how these modifiers are being calculated.
+
 Let's suppose that we have the following modifiers:
 
 ```csharp
@@ -103,6 +105,8 @@ dexterity.AddModifier(DexterityModFlat);
 The result will be (50(dexterity base value) + 10 (flat modifier) + 0.2 * 50 (additive modifier)) * 1.1(multiplicative modifier) = 77.
 
 The constant order of calculations of the type of modifiers, has the purpose of providing the same result that is independent of the order the player equipped his items or cast his spells on a player character or an NPC.
+
+You can check the Start method in the [Character.cs](Assets/StatSystem/Example/Character.cs) script for a more in depth example with comments of how the modifiers are being calculated after each step.
 
 ## Advanced Usage
 

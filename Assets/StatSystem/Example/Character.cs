@@ -1,4 +1,6 @@
 using UnityEngine;
+using static StatSystem.ModifierType;
+
 namespace StatSystem.Example
 {
 public class Character : MonoBehaviour
@@ -22,10 +24,10 @@ public class Character : MonoBehaviour
 
         public BootsOfSpeed()
         {
-            DexterityModFlat = new Modifier(10f, ModifierType.Flat, this);
-            DexterityModAdditive = new Modifier(0.2f, ModifierType.Additive, this);
-            StrengthModAdditive = new Modifier(-0.1f, ModifierType.Additive, this);
-            DexterityModMulti = new Modifier(0.1f, ModifierType.Multiplicative, this);
+            DexterityModFlat = new Modifier(10f, Flat, this);
+            DexterityModAdditive = new Modifier(0.2f, Additive, this);
+            StrengthModAdditive = new Modifier(-0.1f, Additive, this);
+            DexterityModMulti = new Modifier(0.1f, Multiplicative, this);
         }
     }
 
@@ -34,7 +36,7 @@ public class Character : MonoBehaviour
         public readonly Modifier StrengthModAdditive;
 
         public GlovesOfStrength()
-            => StrengthModAdditive = new Modifier(0.3f, ModifierType.Additive, this);
+            => StrengthModAdditive = new Modifier(0.3f, Additive, this);
     }
 
     private class EnchantedArmor
@@ -44,8 +46,8 @@ public class Character : MonoBehaviour
 
         public EnchantedArmor()
         {
-            StrengthModMulti = new Modifier(0.1f, ModifierType.Multiplicative, this);
-            DexterityModMulti = new Modifier(0.3f, ModifierType.Multiplicative, this);
+            StrengthModMulti = new Modifier(0.1f, Multiplicative, this);
+            DexterityModMulti = new Modifier(0.3f, Multiplicative, this);
         }
     }
 
@@ -56,8 +58,8 @@ public class Character : MonoBehaviour
 
         public AmazingSword()
         {
-            StrengthModMulti = new Modifier(0.2f, ModifierType.Multiplicative, this);
-            StrengthModFlat = new Modifier(20f, ModifierType.Flat, this);
+            StrengthModMulti = new Modifier(0.2f, Multiplicative, this);
+            StrengthModFlat = new Modifier(20f, Flat, this);
         }
     }
 
@@ -68,8 +70,8 @@ public class Character : MonoBehaviour
 
         public WitchKillerAxe()
         {
-            StrengthModMulti = new Modifier(-0.1f, ModifierType.Multiplicative, this);
-            DexterityModMulti = new Modifier(0.5f, ModifierType.Multiplicative, this);
+            StrengthModMulti = new Modifier(-0.1f,Multiplicative, this);
+            DexterityModMulti = new Modifier(0.5f, Multiplicative, this);
         }
     }
 

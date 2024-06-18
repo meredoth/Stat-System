@@ -118,7 +118,7 @@ Let's suppose our new type of modifier will be called ```Base absolute reduction
 
 For example, if we had a base strength stat with a starting value of 100, that had been modified with different modifiers to 200, after the application of the base absolute reduction type with a value of 0.2 (20%) the result should be 80. If we add a base absolute reduction after that with a value of 0.1 (10%) the result would still be 80 as only the biggest of these modifiers apply.
 
-Even if we add a flat modifier of 20 after that, the value will continue to be 80. The moment we remove this base absolute reduction modifier though, all the suppressed modifiers will be applied normally, in our example the value of the strength stat after the removal will be 90 (the base absolute reduction of 10%) and after the removal of the 10% base absolute reduction, the strength value will become 220 (200 plus the 20 flat modifier we added while the base absolute reductions were applied)
+Even if we add a flat modifier of 20 after that, the value will continue to be 80. The moment we remove this base absolute reduction modifier though, all the suppressed modifiers will be applied normally, in our example the value of the strength stat after the removal will be 90 (the base absolute reduction of 10%) and after the removal of the 10% base absolute reduction, the current strength value will be calculated from start with all the previous modifiers that had made the final value 200 plus the 20 flat modifier that was added while the base absolute reductions were applied.
 
 First, we create the ```ModifierOperationsBaseAbsoluteReduction``` class that inherits from the ```ModifierOperationsBase``` class, and we implement the ```CalculateModifiersValue``` method that is appropriate for our new type:
 
@@ -165,7 +165,7 @@ strength = new Stat(100);
 strength.AddModifier(strengthCurse);
 ```
 
-## Overloads of the Stat class
+## Overloads of the Stat class constructor
 
 The Stat class, has two optional parameters. It can be called like this:
 
@@ -181,7 +181,7 @@ strength = new Stat(100, 2, 10);
 
 Here, the third parameter, is the initial size of the maximum number of modifiers of each type that is expected this stat to have at any one point. This parameter helps with avoiding the garbage collector. As each type of modifier has a List with the applied modifiers for the stat, the third parameter effectively initializes those lists with a default capacity.
 
-The initial default capacity of each list is 4. If at any point in time, a list resize is required, a warning will be showed. This won't affect the functionality of the Stat system in any way, it is just a convenient way to avoid the garbage collector during the addition of new modifiers to any of our stats in the game.
+The initial default capacity of each list is 4. If at any point in time, a list resize is required, a warning will be showed in the Unity Console in the editor. This won't affect the functionality of the Stat system in any way, it is just a convenient way to avoid the garbage collector during the addition of new modifiers to any of our stats in the game.
 
 ## Getting the Modifiers of Each Stat
 

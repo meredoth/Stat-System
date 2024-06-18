@@ -11,15 +11,15 @@ public abstract class ModifierOperationsBase : IModifiersOperations
    protected ModifierOperationsBase(int capacity) => Modifiers = new List<Modifier>(capacity);
    protected ModifierOperationsBase() => Modifiers = new List<Modifier>(4);
 
-   public virtual void AddModifier(Modifier modifier)
+   public void AddModifier(Modifier modifier)
    {
       CheckListCapacity(Modifiers, modifier.Type);
       Modifiers.Add(modifier);
    }
 
-   public virtual bool TryRemoveModifier(Modifier modifier) => Modifiers.Remove(modifier);
+   public bool TryRemoveModifier(Modifier modifier) => Modifiers.Remove(modifier);
    
-   public virtual List<Modifier> GetAllModifiers() => Modifiers;
+   public List<Modifier> GetAllModifiers() => Modifiers;
 
    public abstract float CalculateModifiersValue(float baseValue, float currentValue);
 

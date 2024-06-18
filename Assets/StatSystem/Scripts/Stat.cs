@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using UnityEngine;
+using static StatSystem.ModifierType;
 
 namespace StatSystem
 {
@@ -195,7 +196,7 @@ public sealed class Stat
          
          var modifierType = (ModifierType)order;
 
-         if (modifierType is ModifierType.Flat or ModifierType.Additive or ModifierType.Multiplicative)
+         if (modifierType is Flat or Additive or Multiplicative)
             Debug.LogWarning("modifier operations for types flat, additive and multiplicative cannot be changed! Default operations for these types will be used.");
 
          _modifierOperationsDict[modifierType] = modifierOperationsDelegate;
@@ -205,9 +206,9 @@ public sealed class Stat
 
       internal Dictionary<ModifierType, Func<IModifiersOperations>> GetModifierOperations(int capacity)
       {
-         _modifierOperationsDict[ModifierType.Flat] = () => new FlatModifierOperations(capacity);
-         _modifierOperationsDict[ModifierType.Additive] = () => new AdditiveModifierOperations(capacity);
-         _modifierOperationsDict[ModifierType.Multiplicative] = () => new MultiplicativeModifierOperations(capacity);
+         _modifierOperationsDict[Flat] = () => new FlatModifierOperations(capacity);
+         _modifierOperationsDict[Additive] = () => new AdditiveModifierOperations(capacity);
+         _modifierOperationsDict[Multiplicative] = () => new MultiplicativeModifierOperations(capacity);
 
          _modifiersCollectionHasBeenReturned = true;
          

@@ -5,7 +5,7 @@ using System.Globalization;
 namespace StatSystem
 {
 [SuppressMessage("NDepend", "ND1903:StructuresShouldBeImmutable", Justification="const is immutable, false positive")]
-public readonly struct Modifier
+public readonly struct Modifier : IEquatable<Modifier>
 {
    private readonly ModifierType? _type;
    public ModifierType Type => _type ?? ModifierType.Flat;
@@ -19,13 +19,17 @@ public readonly struct Modifier
       Source = source;
    }
 
-   public override bool Equals(object obj) => obj is Modifier modifier && this == modifier;
+   public bool Equals(Modifier other) => 
+      _type == other._type && Equals(Source, other.Source) && Value.Equals(other.Value);
+   
+   public override bool Equals(object obj) => obj is Modifier modifier && Equals(modifier);
 
-   public override int GetHashCode() => Tuple.Create(Type, Value).GetHashCode();
+   public override int GetHashCode() => HashCode.Combine(_type, Source, Value);
 
-   public static bool operator ==(Modifier first, Modifier second) => first.Type == second.Type && 
-         Math.Abs(first.Value - second.Value) < float.Epsilon && 
-         ReferenceEquals(first.Source, second.Source);
+   public static bool operator ==(Modifier first, Modifier second) => 
+      first.Type == second.Type && 
+      Math.Abs(first.Value - second.Value) < float.Epsilon && 
+      ReferenceEquals(first.Source, second.Source);
    
    public static bool operator !=(Modifier first, Modifier second) => !(first == second);
    

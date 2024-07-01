@@ -36,5 +36,12 @@ public readonly struct Modifier : IEquatable<Modifier>
    public override string ToString() => $"Value:{Value.ToString(CultureInfo.InvariantCulture)} Type:{Type} Source object: {Source ?? "None"}";
 
    public static implicit operator float(Modifier modifier) => modifier.Value;
+
+   public void Deconstruct(out float value, out ModifierType type, out object source)
+   {
+      value = Value;
+      type = Type;
+      source = Source;
+   }
 }
 }

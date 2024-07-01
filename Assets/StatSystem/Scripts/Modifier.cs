@@ -33,7 +33,7 @@ public readonly struct Modifier : IEquatable<Modifier>
    
    public static bool operator !=(Modifier first, Modifier second) => !(first == second);
    
-   public override string ToString() => $"Value:{Value.ToString(CultureInfo.InvariantCulture)} Type:{Type}";
+   public override string ToString() => $"Value:{Value.ToString(CultureInfo.InvariantCulture)} Type:{Type} Source object: {Source ?? "None"}";
 
    public static implicit operator float(Modifier modifier) => modifier.Value;
 }

@@ -11,7 +11,7 @@ public sealed class Stat
 {
    private const int DEFAULT_LIST_CAPACITY = 4;
    private const int DEFAULT_DIGIT_ACCURACY = 2;
-   internal const int MAXIMUM_ROUND_DIGITS = 8;
+   private const int MAXIMUM_ROUND_DIGITS = 6;
 
    [SerializeField] private float baseValue;
 

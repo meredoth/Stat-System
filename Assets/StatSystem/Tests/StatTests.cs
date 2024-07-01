@@ -19,7 +19,25 @@ public class StatTests
         _modifierAdditive = new Modifier(0.1f, ModifierType.Additive);
         _modifierMultiplicative = new Modifier(0.2f, ModifierType.Multiplicative);
     }
-    
+
+    [Test]
+    public void CreateDefaultModifier_AddModifier_DoesNotThrow()
+    {
+        Stat testStat = new Stat(10);
+        Modifier defaultModifier = default;
+        
+        Assert.DoesNotThrow( () => testStat.AddModifier(defaultModifier));
+    }
+
+    [Test]
+    public void CreateDefaultModifier_DefaultModifierEqualsToFlatWithZeroValue()
+    {
+        Modifier flatZeroValue = new Modifier(0f, ModifierType.Flat);
+        Modifier defaultModifier = default;
+        
+        Assert.IsTrue(flatZeroValue == defaultModifier);
+    }
+
     [Test]
     public void AddModifier_AddOneModifier_NumberOfStatsModifiersIncreasedByOne()
     {

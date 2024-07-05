@@ -116,7 +116,7 @@ To create a new type of modifier, inherit from the ```ModifierOperationsBase``` 
 
 Then register the new type of modifier to the system by calling the ```Stat.NewModifierType``` static method, that accepts as a first parameter the order of calculation for the new type (Orders of calculation of the already defined types is 100 for Flat, 200 for Additive and 300 for Multiplicative) and as a second parameter a delegate to our new class.
 
-### Example of adding new types of Stats
+### Example of adding a new type of Modifier
 
 Let's suppose our new type of modifier will be called ```Base absolute reduction```. We want this modifier to suppress any existing modifier and make the stat that it is added to, reduced by a percentage of its starting base value. We also want only the biggest reduction of these modifiers to be applied to the stat, the others can be ignored.
 

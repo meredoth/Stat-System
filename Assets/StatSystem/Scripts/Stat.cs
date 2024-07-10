@@ -116,7 +116,13 @@ public sealed class Stat
       return modifiersList.AsReadOnly();
    }
 
-   public IReadOnlyList<Modifier> GetModifiers(ModifierType modifierType) => _modifiersOperations[modifierType].GetAllModifiers().AsReadOnly();
+   public IReadOnlyList<Modifier> GetModifiers(ModifierType modifierType)
+   {
+      if(!Enum.IsDefined(typeof(ModifierType),modifierType))
+         throw new ArgumentOutOfRangeException(nameof(modifierType), $"ModifierType {modifierType} does NOT exist!");
+      
+      return _modifiersOperations[modifierType].GetAllModifiers().AsReadOnly();
+   }
 
    public bool TryRemoveModifier(Modifier modifier)
    {

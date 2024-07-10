@@ -92,6 +92,11 @@ public class StatTests
     }
 
     [Test]
+    public void GetModifier_InvalidModifierType_ThrowsOutOfRangeException() 
+        => Assert.Throws(typeof(ArgumentOutOfRangeException), 
+                         () => { _testStat.GetModifiers((ModifierType)(-666)); });
+
+    [Test]
     public void TryRemoveModifier_RemoveOneModifier_ListOfGetModifiersDecreasedExactlyByOne()
     {
         _testStat.AddModifier(_modifierFlat);
@@ -177,6 +182,7 @@ public class StatTests
     [Test]
     public void AddNewModifier_AddModifierAfterInitialization_ThrowsInvalidOperationException()
     {
+        // ReSharper disable once UnusedVariable
         Stat testStat = new Stat(100);
         
         Assert.Throws(typeof(InvalidOperationException),

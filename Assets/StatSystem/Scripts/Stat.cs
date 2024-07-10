@@ -20,7 +20,6 @@ public sealed class Stat
    private static ModifierOperationsCollection _ModifierOperationsCollection = new();
 
    private readonly int _digitAccuracy;
-   private readonly List<Modifier> _modifiersList = new();
    private readonly SortedList<ModifierType, IModifiersOperations> _modifiersOperations = new();
 
    private float _currentValue;
@@ -109,12 +108,12 @@ public sealed class Stat
 
    public IReadOnlyList<Modifier> GetModifiers()
    {
-      _modifiersList.Clear();
+      List<Modifier> modifiersList = new();
 
       foreach (var modifiersOperation in _modifiersOperations.Values)
-         _modifiersList.AddRange(modifiersOperation.GetAllModifiers());
+         modifiersList.AddRange(modifiersOperation.GetAllModifiers());
 
-      return _modifiersList.AsReadOnly();
+      return modifiersList.AsReadOnly();
    }
 
    public IReadOnlyList<Modifier> GetModifiers(ModifierType modifierType) => _modifiersOperations[modifierType].GetAllModifiers().AsReadOnly();

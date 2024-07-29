@@ -1,16 +1,25 @@
 using System;
-using System.Collections.Generic;
 using NUnit.Framework;
 
 namespace StatSystem.Tests
 {
+[TestFixture]
 public class StatTests
 {
     private Stat _testStat;
     private Modifier _modifierFlat;
     private Modifier _modifierAdditive;
     private Modifier _modifierMultiplicative;
+    private Modifier _modifierCustom;
+    private ModifierType _customModifierType;
 
+    [OneTimeSetUp]
+    public void SetupOnce()
+    {
+        Stat.Init();
+        _customModifierType = Stat.NewModifierType(1000, () => new StubModifiersOperations());
+    }
+    
     [SetUp]
     public void Setup()
     {
@@ -18,6 +27,7 @@ public class StatTests
         _modifierFlat = new Modifier(10, ModifierType.Flat);
         _modifierAdditive = new Modifier(0.1f, ModifierType.Additive);
         _modifierMultiplicative = new Modifier(0.2f, ModifierType.Multiplicative);
+        _modifierCustom = new Modifier(10f, _customModifierType);
     }
 
     [Test]
@@ -95,6 +105,16 @@ public class StatTests
     public void GetModifier_InvalidModifierType_ThrowsOutOfRangeException() 
         => Assert.Throws(typeof(ArgumentOutOfRangeException), 
                          () => { _testStat.GetModifiers((ModifierType)(-666)); });
+
+    [Test]
+    public void GetModifier_CustomModifierType_ReturnsCustomModifier()
+    {
+        _testStat.AddModifier(_modifierCustom);
+        var sut =_testStat.GetModifiers(_customModifierType);
+        
+        Assert.IsNotEmpty(sut);
+        Assert.AreEqual(sut[0],_modifierCustom);
+    }
 
     [Test]
     public void TryRemoveModifier_RemoveOneModifier_ListOfGetModifiersDecreasedExactlyByOne()
@@ -189,12 +209,9 @@ public class StatTests
             delegate { Stat.NewModifierType(400, () => new StubModifiersOperations()); });
     }
     
-    private class StubModifiersOperations : IModifiersOperations
+    private class StubModifiersOperations : ModifierOperationsBase
     {
-        public void AddModifier(Modifier modifier) => throw new NotImplementedException();
-        public bool TryRemoveModifier(Modifier modifier) => throw new NotImplementedException();
-        public List<Modifier> GetAllModifiers() => throw new NotImplementedException();
-        public float CalculateModifiersValue(float baseValue, float currentValue) => throw new NotImplementedException();
+        public override float CalculateModifiersValue(float baseValue, float currentValue) => 0;
     }
 }
 }

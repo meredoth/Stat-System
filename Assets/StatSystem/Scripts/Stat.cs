@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using static StatSystem.ModifierType;
 
+[assembly:InternalsVisibleTo("Tests")]
 namespace StatSystem
 {
 [Serializable]
@@ -27,7 +29,7 @@ public sealed class Stat
 
    [SuppressMessage("NDepend", "ND1701:PotentiallyDeadMethods", Justification="Needed for Unity's disable domain reload feature.")]
    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-   private static void Init() =>  _ModifierOperationsCollection = new();
+   internal static void Init() =>  _ModifierOperationsCollection = new ModifierOperationsCollection();
    
    public Stat(float baseValue, int digitAccuracy, int modsMaxCapacity)
    {
@@ -35,17 +37,12 @@ public sealed class Stat
       _currentValue = baseValue;
       _digitAccuracy = digitAccuracy;
 
-      InitializeModifierOperations(modsMaxCapacity);
-
-      // local method
-      void InitializeModifierOperations(int capacity)
-      {
-         var modifierOperations = _ModifierOperationsCollection.GetModifierOperations(capacity);
-
-         foreach (var operationType in modifierOperations.Keys)
-            _modifiersOperations[operationType] = modifierOperations[operationType]();
-      }
+      var modifierOperations = _ModifierOperationsCollection.GetModifierOperations(modsMaxCapacity);
+      
+      foreach (var operationType in modifierOperations.Keys)
+         _modifiersOperations[operationType] = modifierOperations[operationType]();
    }
+   
    public Stat(float baseValue) : this(baseValue, DEFAULT_DIGIT_ACCURACY, DEFAULT_LIST_CAPACITY) { }
    public Stat(float baseValue, int digitAccuracy) : this(baseValue, digitAccuracy, DEFAULT_LIST_CAPACITY) { }
 
@@ -118,7 +115,7 @@ public sealed class Stat
 
    public IReadOnlyList<Modifier> GetModifiers(ModifierType modifierType)
    {
-      if(!Enum.IsDefined(typeof(ModifierType),modifierType))
+      if(!_modifiersOperations.TryGetValue(modifierType, out _))
          throw new ArgumentOutOfRangeException(nameof(modifierType), $"ModifierType {modifierType} does NOT exist!");
       
       return _modifiersOperations[modifierType].GetAllModifiers().AsReadOnly();

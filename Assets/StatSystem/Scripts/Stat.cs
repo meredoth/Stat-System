@@ -46,6 +46,8 @@ public sealed class Stat
    public Stat(float baseValue) : this(baseValue, DEFAULT_DIGIT_ACCURACY, DEFAULT_LIST_CAPACITY) { }
    public Stat(float baseValue, int digitAccuracy) : this(baseValue, digitAccuracy, DEFAULT_LIST_CAPACITY) { }
 
+   public static bool CanAddNewModifierType => !_ModifierOperationsCollection.HasCollectionBeenReturned;
+   
    public float BaseValue
    {
       get => baseValue;
@@ -85,12 +87,6 @@ public sealed class Stat
    public event Action ValueChanged;
    public event Action ModifiersChanged;
 
-   public void AddModifier(Modifier modifier)
-   {
-      IsDirty = true;
-      _modifiersOperations[modifier.Type].AddModifier(modifier);
-   }
-
    public static ModifierType NewModifierType(int order, Func<IModifiersOperations> modifierOperationsDelegate)
    {
       try
@@ -101,6 +97,12 @@ public sealed class Stat
       {
          throw new InvalidOperationException("Add any modifier operations before any initialization of the Stat class!");
       }
+   }
+   
+   public void AddModifier(Modifier modifier)
+   {
+      IsDirty = true;
+      _modifiersOperations[modifier.Type].AddModifier(modifier);
    }
 
    public IReadOnlyList<Modifier> GetModifiers()
@@ -190,6 +192,8 @@ public sealed class Stat
    {
       private readonly Dictionary<ModifierType, Func<IModifiersOperations>> _modifierOperationsDict = new();
       private bool _modifiersCollectionHasBeenReturned;
+
+      internal bool HasCollectionBeenReturned => _modifiersCollectionHasBeenReturned;
       
       internal ModifierType AddModifierOperation(int order, Func<IModifiersOperations> modifierOperationsDelegate)
       {
@@ -206,7 +210,7 @@ public sealed class Stat
          return modifierType;
       }
 
-      internal Dictionary<ModifierType, Func<IModifiersOperations>> GetModifierOperations(int capacity)
+      internal IReadOnlyDictionary<ModifierType, Func<IModifiersOperations>> GetModifierOperations(int capacity)
       {
          _modifierOperationsDict[Flat] = () => new FlatModifierOperations(capacity);
          _modifierOperationsDict[Additive] = () => new AdditiveModifierOperations(capacity);

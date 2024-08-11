@@ -31,6 +31,12 @@ public class StatTests
     }
 
     [Test]
+    public void CanAddNewModifierType_AfterNewModifierTypeHasBeenAdded_ReturnsFalse()
+    {
+        Assert.False(Stat.CanAddNewModifierType);
+    }
+    
+    [Test]
     public void CreateDefaultModifier_AddModifier_DoesNotThrow()
     {
         Stat testStat = new Stat(10);

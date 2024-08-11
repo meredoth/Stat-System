@@ -214,6 +214,30 @@ public class StatTests
         Assert.Throws(typeof(InvalidOperationException),
             delegate { Stat.NewModifierType(400, () => new StubModifiersOperations()); });
     }
+
+    [Test]
+    public void ContainsModifier_ModifierExists_ReturnsTrue()
+    {
+        var modifierWithObject = new Modifier(10f, _customModifierType, this);
+        
+        _testStat.AddModifier(modifierWithObject);
+        _testStat.AddModifier(_modifierFlat);
+        
+        Assert.True(_testStat.ContainsModifier(_modifierFlat));
+        Assert.True(_testStat.ContainsModifier(modifierWithObject));
+    }
+
+    [Test]
+    public void ContainsModifier_ModifierDoesNotExist_ReturnsFalse()
+    {
+        var modifierWithObject = new Modifier(10f, _customModifierType, this);
+        var modifierWithNewObject = new Modifier(10f, _customModifierType, new object());
+        
+        _testStat.AddModifier(modifierWithNewObject);
+        
+        Assert.False(_testStat.ContainsModifier(_modifierFlat));
+        Assert.False(_testStat.ContainsModifier(modifierWithObject));
+    }
     
     private class StubModifiersOperations : ModifierOperationsBase
     {

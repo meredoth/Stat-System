@@ -171,6 +171,10 @@ public sealed class Stat
       }
    }
 
+   public bool ContainsModifier(Modifier modifier) => 
+      _modifiersOperations.ContainsKey(modifier.Type) && 
+      _modifiersOperations[modifier.Type].GetAllModifiers().Contains(modifier);
+
    private float CalculateModifiedValue(int digitAccuracy)
    {
       digitAccuracy = Math.Clamp(digitAccuracy, 0, MAXIMUM_ROUND_DIGITS);

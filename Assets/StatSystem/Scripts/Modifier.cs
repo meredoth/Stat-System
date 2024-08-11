@@ -1,10 +1,8 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace StatSystem
 {
-[SuppressMessage("NDepend", "ND1903:StructuresShouldBeImmutable", Justification="const is immutable, false positive")]
 public readonly struct Modifier : IEquatable<Modifier>
 {
    private readonly ModifierType? _type;

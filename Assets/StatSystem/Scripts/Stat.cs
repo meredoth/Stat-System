@@ -105,6 +105,22 @@ public sealed class Stat
       _modifiersOperations[modifier.Type].AddModifier(modifier);
    }
 
+   public void AddModifiers(ReadOnlySpan<Modifier> modifiers)
+   {
+      IsDirty = true;
+      
+      foreach (var modifier in modifiers)
+         _modifiersOperations[modifier.Type].AddModifier(modifier);
+   }
+   
+   public void AddModifiers(List<Modifier> modifiers)
+   {
+      IsDirty = true;
+      
+      foreach (var modifier in modifiers)
+         _modifiersOperations[modifier.Type].AddModifier(modifier);
+   }
+
    public IReadOnlyList<Modifier> GetModifiers()
    {
       List<Modifier> modifiersList = new();
@@ -195,13 +211,12 @@ public sealed class Stat
    private sealed class ModifierOperationsCollection
    {
       private readonly Dictionary<ModifierType, Func<IModifiersOperations>> _modifierOperationsDict = new();
-      private bool _modifiersCollectionHasBeenReturned;
 
-      internal bool HasCollectionBeenReturned => _modifiersCollectionHasBeenReturned;
-      
+      internal bool HasCollectionBeenReturned { get; private set; }
+
       internal ModifierType AddModifierOperation(int order, Func<IModifiersOperations> modifierOperationsDelegate)
       {
-         if (_modifiersCollectionHasBeenReturned)
+         if (HasCollectionBeenReturned)
             throw new InvalidOperationException("Cannot change collection after it has been returned");
          
          var modifierType = (ModifierType)order;
@@ -220,7 +235,7 @@ public sealed class Stat
          _modifierOperationsDict[Additive] = () => new AdditiveModifierOperations(capacity);
          _modifierOperationsDict[Multiplicative] = () => new MultiplicativeModifierOperations(capacity);
 
-         _modifiersCollectionHasBeenReturned = true;
+         HasCollectionBeenReturned = true;
          
          return _modifierOperationsDict;
       }

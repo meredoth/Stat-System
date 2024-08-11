@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 
 namespace StatSystem.Tests
@@ -57,16 +58,47 @@ public class StatTests
     [Test]
     public void AddModifier_AddOneModifier_NumberOfStatsModifiersIncreasedByOne()
     {
-        Stat testStat = new(10);
         Modifier modifier = new Modifier(10, ModifierType.Flat);
         
-        var numberOfModifiersBefore = testStat.GetModifiers().Count;
-        testStat.AddModifier(modifier);
-        var numberOfModifiersAfter = testStat.GetModifiers().Count;
+        var numberOfModifiersBefore = _testStat.GetModifiers().Count;
+        _testStat.AddModifier(modifier);
+        var numberOfModifiersAfter = _testStat.GetModifiers().Count;
         
         Assert.AreEqual(numberOfModifiersAfter, numberOfModifiersBefore + 1);
     }
 
+    [Test]
+    public void AddModifiers_AddArrayOfModifiers_ContainEachModifierReturnsTrue()
+    {
+        Modifier[] modifiersArray = { _modifierFlat, _modifierAdditive, _modifierMultiplicative, _modifierCustom };
+        
+        var numberOfModifiersBefore = _testStat.GetModifiers().Count;
+        _testStat.AddModifiers(modifiersArray);
+        var numberOfModifiersAfter = _testStat.GetModifiers().Count;
+        
+        Assert.AreEqual(numberOfModifiersAfter, numberOfModifiersBefore + 4);
+        Assert.True(_testStat.ContainsModifier(_modifierFlat));
+        Assert.True(_testStat.ContainsModifier(_modifierAdditive));
+        Assert.True(_testStat.ContainsModifier(_modifierMultiplicative));
+        Assert.True(_testStat.ContainsModifier(_modifierCustom));
+    }
+    
+    [Test]
+    public void AddModifiers_AddListOfModifiers_ContainEachModifierReturnsTrue()
+    {
+        List<Modifier> modifiersList = new (){ _modifierFlat, _modifierAdditive, _modifierMultiplicative, _modifierCustom };
+        
+        var numberOfModifiersBefore = _testStat.GetModifiers().Count;
+        _testStat.AddModifiers(modifiersList);
+        var numberOfModifiersAfter = _testStat.GetModifiers().Count;
+        
+        Assert.AreEqual(numberOfModifiersAfter, numberOfModifiersBefore + 4);
+        Assert.True(_testStat.ContainsModifier(_modifierFlat));
+        Assert.True(_testStat.ContainsModifier(_modifierAdditive));
+        Assert.True(_testStat.ContainsModifier(_modifierMultiplicative));
+        Assert.True(_testStat.ContainsModifier(_modifierCustom));
+    }
+    
     [TestCase(ModifierType.Flat)]
     [TestCase(ModifierType.Additive)]
     [TestCase(ModifierType.Multiplicative)]

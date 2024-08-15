@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using UnityEngine;
-using static StatSystem.ModifierType;
 
 [assembly:InternalsVisibleTo("Tests")]
 namespace StatSystem
 {
+/// <summary>Represents a statistical value that can be modified by various types of modifiers.</summary>
 [Serializable]
-public sealed class Stat
+public sealed partial class Stat
 {
    private const int DEFAULT_LIST_CAPACITY = 4;
    private const int DEFAULT_DIGIT_ACCURACY = 2;
@@ -27,10 +27,18 @@ public sealed class Stat
    private float _currentValue;
    private bool _isDirty;
 
+   /// <summary>Initializes the static _ModifierOperationsCollection. Used for Unity's domain reload feature.</summary>
    [SuppressMessage("NDepend", "ND1701:PotentiallyDeadMethods", Justification="Needed for Unity's disable domain reload feature.")]
    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
    internal static void Init() =>  _ModifierOperationsCollection = new ModifierOperationsCollection();
    
+   /// <summary>
+   /// Initializes a new instance of the <see cref="Stat"/> class with a base value, digit accuracy,
+   /// and expected maximum capacity for each modifier type, to avoid extra array allocations from the list.
+   /// </summary>
+   /// <param name="baseValue">The base value of the stat.</param>
+   /// <param name="digitAccuracy">The number of digits to round the calculated value to.</param>
+   /// <param name="modsMaxCapacity">The maximum number of modifiers each modifier type is expected to hold.</param>
    public Stat(float baseValue, int digitAccuracy, int modsMaxCapacity)
    {
       this.baseValue = baseValue;
@@ -43,11 +51,19 @@ public sealed class Stat
          _modifiersOperations[operationType] = modifierOperations[operationType]();
    }
    
+   /// <summary>Initializes a new instance of the <see cref="Stat"/> class with a base value and default settings.</summary>
+   /// <param name="baseValue">The base value of the stat.</param>
    public Stat(float baseValue) : this(baseValue, DEFAULT_DIGIT_ACCURACY, DEFAULT_LIST_CAPACITY) { }
+   
+   /// <summary>Initializes a new instance of the <see cref="Stat"/> class with a base value and specified digit accuracy.</summary>
+   /// <param name="baseValue">The base value of the stat.</param>
+   /// <param name="digitAccuracy">The number of digits to round the calculated value to.</param>
    public Stat(float baseValue, int digitAccuracy) : this(baseValue, digitAccuracy, DEFAULT_LIST_CAPACITY) { }
 
+   /// <summary>Gets a value indicating whether a new modifier type can be added.</summary>
    public static bool CanAddNewModifierType => !_ModifierOperationsCollection.HasCollectionBeenReturned;
    
+   /// <summary>Gets or sets the base value of the stat.</summary>
    public float BaseValue
    {
       get => baseValue;
@@ -59,6 +75,7 @@ public sealed class Stat
       }
    }
 
+   /// <summary>Gets the current value of the stat, taking into account all applied modifiers.</summary>
    public float Value
    {
       get
@@ -84,9 +101,17 @@ public sealed class Stat
       }
    }
 
+   /// <summary>Occurs when the stat's current or base value changes.</summary>
    public event Action ValueChanged;
+   
+   /// <summary>Occurs when the stat's modifiers change.</summary>
    public event Action ModifiersChanged;
 
+   /// <summary>Adds a new modifier type with a specified order and operation.</summary>
+   /// <param name="order">The calculation order of the modifier type.</param>
+   /// <param name="modifierOperationsDelegate">The delegate that defines the operations for the modifier type.</param>
+   /// <returns>The newly created <see cref="ModifierType"/>.</returns>
+   /// <exception cref="InvalidOperationException">Thrown if attempting to add a modifier type after stat initialization.</exception>
    public static ModifierType NewModifierType(int order, Func<IModifiersOperations> modifierOperationsDelegate)
    {
       try
@@ -99,12 +124,16 @@ public sealed class Stat
       }
    }
    
+   /// <summary>Adds a modifier to the stat.</summary>
+   /// <param name="modifier">The modifier to add.</param>
    public void AddModifier(Modifier modifier)
    {
       IsDirty = true;
       _modifiersOperations[modifier.Type].AddModifier(modifier);
    }
 
+   /// <summary>Adds multiple modifiers to the stat.</summary>
+   /// <param name="modifiers">A read-only span of modifiers to add.</param>
    public void AddModifiers(ReadOnlySpan<Modifier> modifiers)
    {
       IsDirty = true;
@@ -113,6 +142,8 @@ public sealed class Stat
          _modifiersOperations[modifier.Type].AddModifier(modifier);
    }
    
+   /// <summary>Adds multiple modifiers to the stat.</summary>
+   /// <param name="modifiers">A list of modifiers to add.</param>
    public void AddModifiers(List<Modifier> modifiers)
    {
       IsDirty = true;
@@ -121,6 +152,8 @@ public sealed class Stat
          _modifiersOperations[modifier.Type].AddModifier(modifier);
    }
 
+   /// <summary>Gets all modifiers currently applied to the stat.</summary>
+   /// <returns>A read-only list of all modifiers.</returns>
    public IReadOnlyList<Modifier> GetModifiers()
    {
       List<Modifier> modifiersList = new();
@@ -131,6 +164,10 @@ public sealed class Stat
       return modifiersList.AsReadOnly();
    }
 
+   /// <summary>Gets all modifiers of a specific type currently applied to the stat.</summary>
+   /// <param name="modifierType">The type of modifier to retrieve.</param>
+   /// <returns>A read-only list of modifiers of the specified type.</returns>
+   /// <exception cref="ArgumentOutOfRangeException">Thrown if the specified modifier type does not exist.</exception>
    public IReadOnlyList<Modifier> GetModifiers(ModifierType modifierType)
    {
       if(!_modifiersOperations.TryGetValue(modifierType, out _))
@@ -139,6 +176,9 @@ public sealed class Stat
       return _modifiersOperations[modifierType].GetAllModifiers().AsReadOnly();
    }
 
+   /// <summary>Tries to remove a modifier from the stat.</summary>
+   /// <param name="modifier">The modifier to remove.</param>
+   /// <returns><c>true</c> if the modifier was removed; otherwise, <c>false</c>.</returns>
    public bool TryRemoveModifier(Modifier modifier)
    {
       var isModifierRemoved = false;
@@ -152,6 +192,9 @@ public sealed class Stat
       return isModifierRemoved;
    }
 
+   /// <summary>Tries to remove all modifiers from a specific source.</summary>
+   /// <param name="source">The source of the modifiers to remove.</param>
+   /// <returns><c>true</c> if any modifiers were removed; otherwise, <c>false</c>.</returns>
    public bool TryRemoveAllModifiersOf(object source)
    {
       bool isModifierRemoved = false;
@@ -187,6 +230,9 @@ public sealed class Stat
       }
    }
 
+   /// <summary>Determines whether the stat contains a specific modifier.</summary>
+   /// <param name="modifier">The modifier to check for.</param>
+   /// <returns><c>true</c> if the stat contains the modifier; otherwise, <c>false</c>.</returns>
    public bool ContainsModifier(Modifier modifier) => 
       _modifiersOperations.ContainsKey(modifier.Type) && 
       _modifiersOperations[modifier.Type].GetAllModifiers().Contains(modifier);
@@ -207,83 +253,5 @@ public sealed class Stat
 
    private void OnValueChanged() => ValueChanged?.Invoke();
    private void OnModifiersChanged() => ModifiersChanged?.Invoke();
-
-   private sealed class ModifierOperationsCollection
-   {
-      private readonly Dictionary<ModifierType, Func<IModifiersOperations>> _modifierOperationsDict = new();
-
-      internal bool HasCollectionBeenReturned { get; private set; }
-
-      internal ModifierType AddModifierOperation(int order, Func<IModifiersOperations> modifierOperationsDelegate)
-      {
-         if (HasCollectionBeenReturned)
-            throw new InvalidOperationException("Cannot change collection after it has been returned");
-         
-         var modifierType = (ModifierType)order;
-
-         if (modifierType is Flat or Additive or Multiplicative)
-            Debug.LogWarning("modifier operations for types flat, additive and multiplicative cannot be changed! Default operations for these types will be used.");
-
-         _modifierOperationsDict[modifierType] = modifierOperationsDelegate;
-
-         return modifierType;
-      }
-
-      internal IReadOnlyDictionary<ModifierType, Func<IModifiersOperations>> GetModifierOperations(int capacity)
-      {
-         _modifierOperationsDict[Flat] = () => new FlatModifierOperations(capacity);
-         _modifierOperationsDict[Additive] = () => new AdditiveModifierOperations(capacity);
-         _modifierOperationsDict[Multiplicative] = () => new MultiplicativeModifierOperations(capacity);
-
-         HasCollectionBeenReturned = true;
-         
-         return _modifierOperationsDict;
-      }
-
-      private sealed class FlatModifierOperations : ModifierOperationsBase
-      {
-         internal FlatModifierOperations(int capacity) : base(capacity) { }
-
-         public override float CalculateModifiersValue(float baseValue, float currentValue)
-         {
-            float flatModifiersSum = 0f;
-
-            for (var i = 0; i < Modifiers.Count; i++)
-               flatModifiersSum += Modifiers[i];
-
-            return flatModifiersSum;
-         }
-      }
-
-      private sealed class AdditiveModifierOperations : ModifierOperationsBase
-      {
-         internal AdditiveModifierOperations(int capacity) : base(capacity) { }
-
-         public override float CalculateModifiersValue(float baseValue, float currentValue)
-         {
-            float additiveModifiersSum = 0f;
-
-            for (var i = 0; i < Modifiers.Count; i++)
-               additiveModifiersSum += Modifiers[i];
-
-            return baseValue * additiveModifiersSum;
-         }
-      }
-
-      private sealed class MultiplicativeModifierOperations : ModifierOperationsBase
-      {
-         internal MultiplicativeModifierOperations(int capacity) : base(capacity) { }
-
-         public override float CalculateModifiersValue(float baseValue, float currentValue)
-         {
-            float calculatedValue = currentValue;
-
-            for (var i = 0; i < Modifiers.Count; i++)
-               calculatedValue += calculatedValue * Modifiers[i];
-
-            return calculatedValue - currentValue;
-         }
-      }
-   }
 }
 }

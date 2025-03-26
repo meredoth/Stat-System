@@ -2,7 +2,7 @@ using NUnit.Framework;
 
 namespace StatSystem.Tests
 {
-public class ModifierOperationMultiplicativeCalculationsTests
+internal class ModifierOperationMultiplicativeCalculationsTests
 {
    private const int BASE_VALUE = 20;
    private const float TEN_PERCENT = 0.1f;

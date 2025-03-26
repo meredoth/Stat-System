@@ -5,7 +5,7 @@ using NUnit.Framework;
 namespace StatSystem.Tests
 {
 [TestFixture]
-public class StatTests
+internal class StatTests
 {
     private Stat _testStat;
     private Modifier _modifierFlat;

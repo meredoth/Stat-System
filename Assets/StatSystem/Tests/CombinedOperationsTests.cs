@@ -2,7 +2,7 @@ using NUnit.Framework;
 
 namespace StatSystem.Tests
 {
-public class CombinedOperationsTests
+internal class CombinedOperationsTests
 {
    private const int BASE_VALUE = 100;
    private Stat _testStat;

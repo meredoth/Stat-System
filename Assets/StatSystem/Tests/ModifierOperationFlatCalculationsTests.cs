@@ -2,7 +2,7 @@ using NUnit.Framework;
 
 namespace StatSystem.Tests
 {
-public class ModifierOperationFlatCalculationsTests
+internal class ModifierOperationFlatCalculationsTests
 {
     private const int BASE_VALUE = 20;
     private const int TEN = 10;

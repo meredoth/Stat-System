@@ -3,7 +3,7 @@
 namespace StatSystem.Tests
 {
 [TestFixture]
-public class ModifierTests
+internal class ModifierTests
 {
    private Modifier _firstModifier;
    private Modifier _secondModifier;
@@ -40,7 +40,7 @@ public class ModifierTests
       Assert.IsFalse(_firstModifier == _defaultValuesModifier);
 
    [Test]
-   public void OperatorEquals_EqualityForDefaultModifer_ReturnsTrue() => 
+   public void OperatorEquals_EqualityForDefaultModifier_ReturnsTrue() => 
       Assert.IsTrue(_defaultModifier == _defaultValuesModifier);
 }
 }

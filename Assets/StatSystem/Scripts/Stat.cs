@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+// ReSharper disable IntroduceOptionalParameters.Global
 
 [assembly:InternalsVisibleTo("Tests")]
 namespace StatSystem
@@ -144,7 +145,7 @@ public sealed partial class Stat
    
    /// <summary>Adds multiple modifiers to the stat.</summary>
    /// <param name="modifiers">A list of modifiers to add.</param>
-   public void AddModifiers(List<Modifier> modifiers)
+   public void AddModifiers(IEnumerable<Modifier> modifiers)
    {
       IsDirty = true;
       

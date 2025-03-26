@@ -73,7 +73,7 @@ internal class StatTests
         Modifier[] modifiersArray = { _modifierFlat, _modifierAdditive, _modifierMultiplicative, _modifierCustom };
         
         var numberOfModifiersBefore = _testStat.GetModifiers().Count;
-        _testStat.AddModifiers(modifiersArray);
+        _testStat.AddModifiers(modifiersArray.AsSpan());
         var numberOfModifiersAfter = _testStat.GetModifiers().Count;
         
         Assert.AreEqual(numberOfModifiersAfter, numberOfModifiersBefore + 4);

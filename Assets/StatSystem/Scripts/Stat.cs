@@ -155,26 +155,26 @@ public sealed partial class Stat
 
    /// <summary>Gets all modifiers currently applied to the stat.</summary>
    /// <returns>A read-only list of all modifiers.</returns>
-   public IReadOnlyList<Modifier> GetModifiers()
+   public ModifiersList GetModifiers()
    {
       List<Modifier> modifiersList = new();
 
       foreach (var modifiersOperation in _modifiersOperations.Values)
          modifiersList.AddRange(modifiersOperation.GetAllModifiers());
 
-      return modifiersList.AsReadOnly();
+      return new ModifiersList(modifiersList.AsReadOnly());
    }
 
    /// <summary>Gets all modifiers of a specific type currently applied to the stat.</summary>
    /// <param name="modifierType">The type of modifier to retrieve.</param>
    /// <returns>A read-only list of modifiers of the specified type.</returns>
    /// <exception cref="ArgumentOutOfRangeException">Thrown if the specified modifier type does not exist.</exception>
-   public IReadOnlyList<Modifier> GetModifiers(ModifierType modifierType)
+   public ModifiersList GetModifiers(ModifierType modifierType)
    {
       if(!_modifiersOperations.TryGetValue(modifierType, out _))
          throw new ArgumentOutOfRangeException(nameof(modifierType), $"ModifierType {modifierType} does NOT exist!");
       
-      return _modifiersOperations[modifierType].GetAllModifiers().AsReadOnly();
+      return new ModifiersList(_modifiersOperations[modifierType].GetAllModifiers().AsReadOnly());
    }
 
    /// <summary>Tries to remove a modifier from the stat.</summary>

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 // ReSharper disable IntroduceOptionalParameters.Global
@@ -9,17 +8,14 @@ using UnityEngine;
 namespace StatSystem
 {
 /// <summary>Represents a statistical value that can be modified by various types of modifiers.</summary>
-[Serializable]
 public sealed partial class Stat
 {
    private const int DEFAULT_LIST_CAPACITY = 4;
    private const int DEFAULT_DIGIT_ACCURACY = 2;
    private const int MAXIMUM_ROUND_DIGITS = 6;
 
-   [SerializeField] private float baseValue;
-
-   [SuppressMessage("NDepend", "ND1902:AvoidStaticFieldsWithAMutableFieldType", Justification="Cannot mutate after Instantiation of Stat, will throw.")]
-   [SuppressMessage("NDepend", "ND1901:AvoidNonReadOnlyStaticFields", Justification="Not readonly so that it can be called from Init() for reset.")]
+   private float baseValue;
+   
    private static ModifierOperationsCollection _ModifierOperationsCollection = new();
 
    private readonly int _digitAccuracy;
@@ -27,12 +23,11 @@ public sealed partial class Stat
 
    private float _currentValue;
    private bool _isDirty;
-
-   /// <summary>Initializes the static _ModifierOperationsCollection. Used for Unity's domain reload feature.</summary>
-   [SuppressMessage("NDepend", "ND1701:PotentiallyDeadMethods", Justification="Needed for Unity's disable domain reload feature.")]
-   [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-   internal static void Init() =>  _ModifierOperationsCollection = new ModifierOperationsCollection();
    
+   /// <summary>Initializes the static _ModifierOperationsCollection. Used for Unity's domain reload feature.</summary>
+   [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+   internal static void Init() => _ModifierOperationsCollection = new ModifierOperationsCollection();
+
    /// <summary>
    /// Initializes a new instance of the <see cref="Stat"/> class with a base value, digit accuracy,
    /// and expected maximum capacity for each modifier type, to avoid extra array allocations from the list.
@@ -45,7 +40,7 @@ public sealed partial class Stat
       this.baseValue = baseValue;
       _currentValue = baseValue;
       _digitAccuracy = digitAccuracy;
-
+      
       var modifierOperations = _ModifierOperationsCollection.GetModifierOperations(modsMaxCapacity);
       
       foreach (var operationType in modifierOperations.Keys)
@@ -60,7 +55,7 @@ public sealed partial class Stat
    /// <param name="baseValue">The base value of the stat.</param>
    /// <param name="digitAccuracy">The number of digits to round the calculated value to.</param>
    public Stat(float baseValue, int digitAccuracy) : this(baseValue, digitAccuracy, DEFAULT_LIST_CAPACITY) { }
-
+   
    /// <summary>Gets a value indicating whether a new modifier type can be added.</summary>
    public static bool CanAddNewModifierType => !_ModifierOperationsCollection.HasCollectionBeenReturned;
    
@@ -115,14 +110,10 @@ public sealed partial class Stat
    /// <exception cref="InvalidOperationException">Thrown if attempting to add a modifier type after stat initialization.</exception>
    public static ModifierType NewModifierType(int order, Func<IModifiersOperations> modifierOperationsDelegate)
    {
-      try
-      {
-         return _ModifierOperationsCollection.AddModifierOperation(order, modifierOperationsDelegate);
-      }
-      catch
-      {
+      if(!CanAddNewModifierType)
          throw new InvalidOperationException("Add any modifier operations before any initialization of the Stat class!");
-      }
+      
+      return _ModifierOperationsCollection.AddModifierOperation(order, modifierOperationsDelegate);
    }
    
    /// <summary>Adds a modifier to the stat.</summary>

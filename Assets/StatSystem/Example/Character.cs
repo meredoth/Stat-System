@@ -5,8 +5,11 @@ namespace StatSystem.Example
 {
 public class Character : MonoBehaviour
 {
-    [SerializeField] private Stat strength;
-    [SerializeField] private Stat dexterity;
+    [SerializeField] private float strength;
+    [SerializeField] private float dexterity;
+    
+    private Stat _strength;
+    private Stat _dexterity;
 
     private readonly BootsOfSpeed _bootsOfSpeed = new();
     private readonly GlovesOfStrength _glovesOfStrength = new();
@@ -82,99 +85,99 @@ public class Character : MonoBehaviour
     
     void Start()
     {
-        strength = new Stat(100);
-        dexterity = new Stat(50);
+        _strength = new Stat(strength);
+        _dexterity = new Stat(dexterity);
         
         Modifier strengthCurse = new Modifier(0.2f, _baseAbsoluteReduction);
         Modifier witchCurse = new Modifier(0.4f, _baseAbsoluteReduction);
 
-        Debug.Log($"Initial Strength: {strength.Value} and Dexterity: {dexterity.Value}");
+        Debug.Log($"Initial Strength: {_strength.Value} and Dexterity: {_dexterity.Value}");
 
         // strength = 100 - 0.1*100 = 90, dexterity = (50 + 10 + 0.2 * 50) * 1.1 = 77
         Debug.Log("Equipping boots of speed (-10% strength additive, 10 flat dexterity, 20% additive dexterity, 10% multiplicative dexterity)");
-        strength.AddModifier(_bootsOfSpeed.StrengthModAdditive);
-        dexterity.AddModifier(_bootsOfSpeed.DexterityModFlat);
-        dexterity.AddModifier(_bootsOfSpeed.DexterityModAdditive);
-        dexterity.AddModifier(_bootsOfSpeed.DexterityModMulti);
-        Debug.Log($"Stats are now, Strength {strength.Value} and Dexterity {dexterity.Value}");
+        _strength.AddModifier(_bootsOfSpeed.StrengthModAdditive);
+        _dexterity.AddModifier(_bootsOfSpeed.DexterityModFlat);
+        _dexterity.AddModifier(_bootsOfSpeed.DexterityModAdditive);
+        _dexterity.AddModifier(_bootsOfSpeed.DexterityModMulti);
+        Debug.Log($"Stats are now, Strength {_strength.Value} and Dexterity {_dexterity.Value}");
 
         // strength = 100 - 0.1 * 100 + 0.3 * 100 = 120
         Debug.Log("Equipping Gloves Of Strength (30% strength additive)");
-        strength.AddModifier(_glovesOfStrength.StrengthModAdditive);
-        Debug.Log($"Stats are now, Strength {strength.Value} and Dexterity {dexterity.Value}");
+        _strength.AddModifier(_glovesOfStrength.StrengthModAdditive);
+        Debug.Log($"Stats are now, Strength {_strength.Value} and Dexterity {_dexterity.Value}");
         
         // strength = (100 - 0.1 * 100 + 0.3 * 100) * 1.1 = 132, dexterity = (50 + 10 + 0.2 * 50) * 1.1 * 1.3 = 100.1
         Debug.Log("Equipping Enchanted Armor (10% strength multiplicative, 30% dexterity multiplicative)");
-        strength.AddModifier(_enchantedArmor.StrengthModMulti);
-        dexterity.AddModifier(_enchantedArmor.DexterityModMulti);
-        Debug.Log($"Stats are now, Strength {strength.Value} and Dexterity {dexterity.Value}");
+        _strength.AddModifier(_enchantedArmor.StrengthModMulti);
+        _dexterity.AddModifier(_enchantedArmor.DexterityModMulti);
+        Debug.Log($"Stats are now, Strength {_strength.Value} and Dexterity {_dexterity.Value}");
         
         // strength = (100 + 0.3 * 100) * 1.1 = 143,
         // dexterity = 50 * 1.3 = 65
         Debug.Log("Removing boots of speed (-10% strength additive, 10 flat dexterity, 20% additive dexterity, 10% multiplicative dexterity)");
-        strength.TryRemoveAllModifiersOf(_bootsOfSpeed);
-        dexterity.TryRemoveAllModifiersOf(_bootsOfSpeed);
-        Debug.Log($"Stats are now, Strength {strength.Value} and Dexterity {dexterity.Value}");
+        _strength.TryRemoveAllModifiersOf(_bootsOfSpeed);
+        _dexterity.TryRemoveAllModifiersOf(_bootsOfSpeed);
+        Debug.Log($"Stats are now, Strength {_strength.Value} and Dexterity {_dexterity.Value}");
 
         // strength = (100 + 0.3 * 100 - 0.1 * 100) * 1.1 = 132,
         // dexterity = (50 + 10 + 0.2 * 50) * 1.1 * 1.3 = 100.1
         Debug.Log("Equipping boots of Speed again (-10% strength additive, 10 flat dexterity, 20% additive dexterity, 10% multiplicative dexterity)");
-        strength.AddModifier(_bootsOfSpeed.StrengthModAdditive);
-        dexterity.AddModifier(_bootsOfSpeed.DexterityModFlat);
-        dexterity.AddModifier(_bootsOfSpeed.DexterityModAdditive);
-        dexterity.AddModifier(_bootsOfSpeed.DexterityModMulti);
-        Debug.Log($"Stats are now, Strength {strength.Value} and Dexterity {dexterity.Value}");
+        _strength.AddModifier(_bootsOfSpeed.StrengthModAdditive);
+        _dexterity.AddModifier(_bootsOfSpeed.DexterityModFlat);
+        _dexterity.AddModifier(_bootsOfSpeed.DexterityModAdditive);
+        _dexterity.AddModifier(_bootsOfSpeed.DexterityModMulti);
+        Debug.Log($"Stats are now, Strength {_strength.Value} and Dexterity {_dexterity.Value}");
         
         // strength = (100 + 20 + 0.3 * 100 - 0.1 * 100) * 1.1 * 1.2 = 184.8
         Debug.Log("Equipping Amazing Sword (20 flat strength, 20% multiplicative strength)");
-        strength.AddModifier(_amazingSword.StrengthModFlat);
-        strength.AddModifier(_amazingSword.StrengthModMulti);
-        Debug.Log($"Stats are now, Strength {strength.Value} and Dexterity {dexterity.Value}");
+        _strength.AddModifier(_amazingSword.StrengthModFlat);
+        _strength.AddModifier(_amazingSword.StrengthModMulti);
+        Debug.Log($"Stats are now, Strength {_strength.Value} and Dexterity {_dexterity.Value}");
         
         // strength suppressed((100 + 20 + 0.3 * 100 - 0.1 * 100) * 1.1 * 1.2 = 184.8) = base value (100) * 0.8 = 80
         Debug.Log("The player drinks a curse potion! (20% strength absolute reduction and suppresses all modifiers)");
-        strength.AddModifier(strengthCurse);
-        Debug.Log($"Stats are now, Strength {strength.Value} and Dexterity {dexterity.Value}");
+        _strength.AddModifier(strengthCurse);
+        Debug.Log($"Stats are now, Strength {_strength.Value} and Dexterity {_dexterity.Value}");
         
         // strength suppressed((100 + 0.3 * 100 - 0.1 * 100) * 1.1 = 132) = base value (100) * 0.8 = 80
         Debug.Log("A witch appears and makes the player drop the Amazing Sword (20 flat strength, 20% multiplicative strength)");
-        strength.TryRemoveAllModifiersOf(_amazingSword);
-        Debug.Log($"Stats are now, Strength {strength.Value} and Dexterity {dexterity.Value}");
+        _strength.TryRemoveAllModifiersOf(_amazingSword);
+        Debug.Log($"Stats are now, Strength {_strength.Value} and Dexterity {_dexterity.Value}");
         
         // strength suppressed((100 + 0.3 * 100 - 0.1 * 100) * 1.1 = 132) = base value (100) * 0.6 = 60
         Debug.Log("The witch casts a witch curse! (40% strength absolute reduction and suppresses all modifiers)");
-        strength.AddModifier(witchCurse);
-        Debug.Log($"Stats are now, Strength {strength.Value} and Dexterity {dexterity.Value}");
+        _strength.AddModifier(witchCurse);
+        Debug.Log($"Stats are now, Strength {_strength.Value} and Dexterity {_dexterity.Value}");
         
         // strength suppressed((100 + 0.3 * 100 - 0.1 * 100) * 1.1 * 0.9 = 118.8) = base value (100) * 0.6 = 60,
         // dexterity = (50 + 10 + 0.2 * 50) * 1.1 * 1.3 * 1.5 = 150.15
         Debug.Log("The player equips the WitchKillerAxe (-10% strength multiplicative, 50% dexterity multiplicative)");
-        strength.AddModifier(_witchKillerAxe.StrengthModMulti);
-        dexterity.AddModifier(_witchKillerAxe.DexterityModMulti);
-        Debug.Log($"Stats are now, Strength {strength.Value} and Dexterity {dexterity.Value}");
+        _strength.AddModifier(_witchKillerAxe.StrengthModMulti);
+        _dexterity.AddModifier(_witchKillerAxe.DexterityModMulti);
+        Debug.Log($"Stats are now, Strength {_strength.Value} and Dexterity {_dexterity.Value}");
         
         // strength suppressed((100 + 0.3 * 100 - 0.1 * 100) * 1.1 * 0.9 = 118.8) = base value (100) * 0.6 = 60,
         Debug.Log("The curse potion effect wears off! (20% strength absolute reduction and suppresses all modifiers)");
-        strength.TryRemoveModifier(strengthCurse);
-        Debug.Log($"Stats are now, Strength {strength.Value} and Dexterity {dexterity.Value}");
+        _strength.TryRemoveModifier(strengthCurse);
+        Debug.Log($"Stats are now, Strength {_strength.Value} and Dexterity {_dexterity.Value}");
         
         // strength = (100 + 0.3 * 100 - 0.1 * 100) * 1.1 * 0.9 = 118.8
         Debug.Log("The witch curse wears off! (40% strength absolute reduction and suppresses all modifiers)");
-        strength.TryRemoveModifier(witchCurse);
-        Debug.Log($"Stats are now, Strength {strength.Value} and Dexterity {dexterity.Value}");
+        _strength.TryRemoveModifier(witchCurse);
+        Debug.Log($"Stats are now, Strength {_strength.Value} and Dexterity {_dexterity.Value}");
         
         // strength = (100 + 0.3 * 100 - 0.1 * 100) * 1.1 = 132,
         // dexterity = (50 + 10 + 0.2 * 50) * 1.1 * 1.3 = 100.1
         Debug.Log("The player kills the witch, removes the WitchKillerAxe (-10% strength multiplicative, 50% dexterity multiplicative)");
-        strength.TryRemoveAllModifiersOf(_witchKillerAxe);
-        dexterity.TryRemoveAllModifiersOf(_witchKillerAxe);
-        Debug.Log($"Stats are now, Strength {strength.Value} and Dexterity {dexterity.Value}");
+        _strength.TryRemoveAllModifiersOf(_witchKillerAxe);
+        _dexterity.TryRemoveAllModifiersOf(_witchKillerAxe);
+        Debug.Log($"Stats are now, Strength {_strength.Value} and Dexterity {_dexterity.Value}");
         
         // strength = (100 + 20 + 0.3 * 100 - 0.1 * 100) * 1.1 * 1.2 = 184.8
         Debug.Log("The player equips his Amazing Sword again (20 flat strength, 20% multiplicative strength)");
-        strength.AddModifier(_amazingSword.StrengthModFlat);
-        strength.AddModifier(_amazingSword.StrengthModMulti);
-        Debug.Log($"Stats are now, Strength {strength.Value} and Dexterity {dexterity.Value}");
+        _strength.AddModifier(_amazingSword.StrengthModFlat);
+        _strength.AddModifier(_amazingSword.StrengthModMulti);
+        Debug.Log($"Stats are now, Strength {_strength.Value} and Dexterity {_dexterity.Value}");
     }
 }
 }

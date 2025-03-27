@@ -42,7 +42,8 @@ RenderSettings:
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 12
+  serializedVersion: 13
+  m_BakeOnSceneLoad: 0
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -288,7 +289,7 @@ MonoBehaviour:
   strength:
     baseValue: 100
   dexterity:
-    baseValue: 0
+    baseValue: 50
 --- !u!212 &1944207293
 SpriteRenderer:
   m_ObjectHideFlags: 0

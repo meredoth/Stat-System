@@ -8,7 +8,7 @@ namespace StatSystem
 public sealed partial class Stat
 {
    /// <summary>Represents a collection of modifier operations.</summary>
-   private sealed class ModifierOperationsCollection
+   private sealed class ModifierOperationsGroups
    {
       private readonly Dictionary<ModifierType, Func<IModifiersOperations>> _modifierOperationsDict = new();
 

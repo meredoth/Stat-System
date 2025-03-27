@@ -14,9 +14,9 @@ public sealed partial class Stat
    private const int DEFAULT_DIGIT_ACCURACY = 2;
    private const int MAXIMUM_ROUND_DIGITS = 6;
 
-   private float baseValue;
+   private float _baseValue;
    
-   private static ModifierOperationsCollection _ModifierOperationsCollection = new();
+   private static ModifierOperationsGroups _ModifierOperationsGroups = new();
 
    private readonly int _digitAccuracy;
    private readonly SortedList<ModifierType, IModifiersOperations> _modifiersOperations = new();
@@ -26,7 +26,7 @@ public sealed partial class Stat
    
    /// <summary>Initializes the static _ModifierOperationsCollection. Used for Unity's domain reload feature.</summary>
    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-   internal static void Init() => _ModifierOperationsCollection = new ModifierOperationsCollection();
+   internal static void Init() => _ModifierOperationsGroups = new ModifierOperationsGroups();
 
    /// <summary>
    /// Initializes a new instance of the <see cref="Stat"/> class with a base value, digit accuracy,
@@ -37,11 +37,11 @@ public sealed partial class Stat
    /// <param name="modsMaxCapacity">The maximum number of modifiers each modifier type is expected to hold.</param>
    public Stat(float baseValue, int digitAccuracy, int modsMaxCapacity)
    {
-      this.baseValue = baseValue;
+      this._baseValue = baseValue;
       _currentValue = baseValue;
       _digitAccuracy = digitAccuracy;
       
-      var modifierOperations = _ModifierOperationsCollection.GetModifierOperations(modsMaxCapacity);
+      var modifierOperations = _ModifierOperationsGroups.GetModifierOperations(modsMaxCapacity);
       
       foreach (var operationType in modifierOperations.Keys)
          _modifiersOperations[operationType] = modifierOperations[operationType]();
@@ -57,15 +57,15 @@ public sealed partial class Stat
    public Stat(float baseValue, int digitAccuracy) : this(baseValue, digitAccuracy, DEFAULT_LIST_CAPACITY) { }
    
    /// <summary>Gets a value indicating whether a new modifier type can be added.</summary>
-   public static bool CanAddNewModifierType => !_ModifierOperationsCollection.HasCollectionBeenReturned;
+   public static bool CanAddNewModifierType => !_ModifierOperationsGroups.HasCollectionBeenReturned;
    
    /// <summary>Gets or sets the base value of the stat.</summary>
    public float BaseValue
    {
-      get => baseValue;
+      get => _baseValue;
       set
       {
-         baseValue = value;
+         _baseValue = value;
          _currentValue = CalculateModifiedValue(_digitAccuracy);
          OnValueChanged();
       }
@@ -113,7 +113,7 @@ public sealed partial class Stat
       if(!CanAddNewModifierType)
          throw new InvalidOperationException("Add any modifier operations before any initialization of the Stat class!");
       
-      return _ModifierOperationsCollection.AddModifierOperation(order, modifierOperationsDelegate);
+      return _ModifierOperationsGroups.AddModifierOperation(order, modifierOperationsDelegate);
    }
    
    /// <summary>Adds a modifier to the stat.</summary>
@@ -233,10 +233,10 @@ public sealed partial class Stat
    {
       digitAccuracy = Math.Clamp(digitAccuracy, 0, MAXIMUM_ROUND_DIGITS);
 
-      float finalValue = baseValue;
+      float finalValue = _baseValue;
 
       for (int i = 0; i < _modifiersOperations.Count; i++)
-         finalValue += _modifiersOperations.Values[i].CalculateModifiersValue(baseValue, finalValue);
+         finalValue += _modifiersOperations.Values[i].CalculateModifiersValue(_baseValue, finalValue);
 
       IsDirty = false;
 

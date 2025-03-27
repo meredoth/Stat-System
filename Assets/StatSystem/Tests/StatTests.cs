@@ -270,6 +270,15 @@ internal class StatTests
         Assert.False(_testStat.ContainsModifier(_modifierFlat));
         Assert.False(_testStat.ContainsModifier(modifierWithObject));
     }
+
+    [Test]
+    public void GetModifiers_ListIsEmpty_ReturnsEmptyCollection()
+    {
+        var modifiers = _testStat.GetModifiers();
+        
+        Assert.NotNull(modifiers);
+        Assert.IsEmpty(modifiers);
+    }
     
     private class StubModifiersOperations : ModifierOperationsBase
     {

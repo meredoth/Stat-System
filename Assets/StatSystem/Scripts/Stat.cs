@@ -145,7 +145,7 @@ public sealed partial class Stat
    }
 
    /// <summary>Gets all modifiers currently applied to the stat.</summary>
-   /// <returns>A read-only list of all modifiers.</returns>
+   /// <returns>A read-only collection of all the modifiers.</returns>
    public ModifiersCollection GetModifiers()
    {
       List<Modifier> modifiersList = new();
@@ -158,7 +158,7 @@ public sealed partial class Stat
 
    /// <summary>Gets all modifiers of a specific type currently applied to the stat.</summary>
    /// <param name="modifierType">The type of modifier to retrieve.</param>
-   /// <returns>A read-only list of modifiers of the specified type.</returns>
+   /// <returns>A read-only modifiers collection of the specified type.</returns>
    /// <exception cref="ArgumentOutOfRangeException">Thrown if the specified modifier type does not exist.</exception>
    public ModifiersCollection GetModifiers(ModifierType modifierType)
    {

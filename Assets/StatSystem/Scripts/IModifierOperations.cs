@@ -15,7 +15,7 @@ public interface IModifiersOperations
    bool TryRemoveModifier(Modifier modifier);
    
    /// <summary>Retrieves all modifiers in the collection.</summary>
-   /// <returns>A list of all modifiers in the collection.</returns>
+   /// <returns>A read only collection of all the modifiers.</returns>
    ModifiersCollection GetAllModifiers();
    
    /// <summary>Calculates the total value of the modifiers applied to a base value.</summary>

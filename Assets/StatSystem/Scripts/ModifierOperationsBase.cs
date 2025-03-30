@@ -31,7 +31,7 @@ public abstract class ModifierOperationsBase : IModifiersOperations
    public bool TryRemoveModifier(Modifier modifier) => Modifiers.Remove(modifier);
 
    /// <summary>Retrieves all modifiers in the list.</summary>
-   /// <returns>A list of all modifiers managed by this instance.</returns>
+   /// <returns>A read-only collection of all modifiers managed by this instance.</returns>
    public ModifiersCollection GetAllModifiers() => new(Modifiers);
 
    /// <summary>

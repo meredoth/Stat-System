@@ -29,10 +29,10 @@ public abstract class ModifierOperationsBase : IModifiersOperations
    /// <param name="modifier">The modifier to remove.</param>
    /// <returns><c>true</c> if the modifier was successfully removed; otherwise, <c>false</c>.</returns>
    public bool TryRemoveModifier(Modifier modifier) => Modifiers.Remove(modifier);
-   
+
    /// <summary>Retrieves all modifiers in the list.</summary>
    /// <returns>A list of all modifiers managed by this instance.</returns>
-   public List<Modifier> GetAllModifiers() => Modifiers;
+   public ModifiersCollection GetAllModifiers() => new(Modifiers);
 
    /// <summary>
    /// Calculates the total value of the modifiers applied to a base value.

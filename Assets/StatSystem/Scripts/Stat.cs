@@ -37,7 +37,7 @@ public sealed partial class Stat
    /// <param name="modsMaxCapacity">The maximum number of modifiers each modifier type is expected to hold.</param>
    public Stat(float baseValue, int digitAccuracy, int modsMaxCapacity)
    {
-      this._baseValue = baseValue;
+      _baseValue = baseValue;
       _currentValue = baseValue;
       _digitAccuracy = digitAccuracy;
       
@@ -146,26 +146,26 @@ public sealed partial class Stat
 
    /// <summary>Gets all modifiers currently applied to the stat.</summary>
    /// <returns>A read-only list of all modifiers.</returns>
-   public ModifiersList GetModifiers()
+   public ModifiersCollection GetModifiers()
    {
       List<Modifier> modifiersList = new();
 
       foreach (var modifiersOperation in _modifiersOperations.Values)
          modifiersList.AddRange(modifiersOperation.GetAllModifiers());
 
-      return new ModifiersList(modifiersList.AsReadOnly());
+      return new ModifiersCollection(modifiersList);
    }
 
    /// <summary>Gets all modifiers of a specific type currently applied to the stat.</summary>
    /// <param name="modifierType">The type of modifier to retrieve.</param>
    /// <returns>A read-only list of modifiers of the specified type.</returns>
    /// <exception cref="ArgumentOutOfRangeException">Thrown if the specified modifier type does not exist.</exception>
-   public ModifiersList GetModifiers(ModifierType modifierType)
+   public ModifiersCollection GetModifiers(ModifierType modifierType)
    {
       if(!_modifiersOperations.TryGetValue(modifierType, out _))
          throw new ArgumentOutOfRangeException(nameof(modifierType), $"ModifierType {modifierType} does NOT exist!");
       
-      return new ModifiersList(_modifiersOperations[modifierType].GetAllModifiers().AsReadOnly());
+      return _modifiersOperations[modifierType].GetAllModifiers();
    }
 
    /// <summary>Tries to remove a modifier from the stat.</summary>
@@ -194,7 +194,7 @@ public sealed partial class Stat
       for (int i = 0; i < _modifiersOperations.Count; i++)
       {
          if (TryRemoveAllModifiersOfSourceFromList(source,
-                _modifiersOperations.Values[i].GetAllModifiers()))
+                _modifiersOperations.Values[i].GetAllModifiers().GetModifiersList()))
          {
             isModifierRemoved = true;
             IsDirty = true;
@@ -205,7 +205,7 @@ public sealed partial class Stat
 
       // local method, static guarantees that it won't be allocated to the heap
       // (It is never converted to delegate, no variable captures)
-      static bool TryRemoveAllModifiersOfSourceFromList(object source, List<Modifier> listOfModifiers)
+      static bool TryRemoveAllModifiersOfSourceFromList(object source, IList<Modifier> listOfModifiers)
       {
          bool modifierHasBeenRemoved = false;
 

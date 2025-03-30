@@ -16,7 +16,7 @@ public interface IModifiersOperations
    
    /// <summary>Retrieves all modifiers in the collection.</summary>
    /// <returns>A list of all modifiers in the collection.</returns>
-   List<Modifier> GetAllModifiers();
+   ModifiersCollection GetAllModifiers();
    
    /// <summary>Calculates the total value of the modifiers applied to a base value.</summary>
    /// <param name="baseValue">The base value of the stat before any modifiers are applied.</param>

@@ -11,8 +11,8 @@ public sealed class ModifierOperationsBaseAbsoluteReduction : ModifierOperations
    {
       var biggestModifier = 0f;
 
-      for (var i = 0; i < Modifiers.Count; i++)
-         biggestModifier = Mathf.Max(biggestModifier, Modifiers[i]);
+      foreach (var t in Modifiers)
+         biggestModifier = Mathf.Max(biggestModifier, t);
 
       var modifierValue = biggestModifier == 0f ? 0f : baseValue * (1 - biggestModifier) - currentValue;
 

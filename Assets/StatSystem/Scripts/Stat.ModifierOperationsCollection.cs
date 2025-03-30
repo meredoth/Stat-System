@@ -62,8 +62,8 @@ public sealed partial class Stat
          {
             float flatModifiersSum = 0f;
 
-            for (var i = 0; i < Modifiers.Count; i++)
-               flatModifiersSum += Modifiers[i];
+            foreach (var t in Modifiers)
+               flatModifiersSum += t;
 
             return flatModifiersSum;
          }
@@ -81,8 +81,8 @@ public sealed partial class Stat
          {
             float additiveModifiersSum = 0f;
 
-            for (var i = 0; i < Modifiers.Count; i++)
-               additiveModifiersSum += Modifiers[i];
+            foreach (var t in Modifiers)
+               additiveModifiersSum += t;
 
             return baseValue * additiveModifiersSum;
          }

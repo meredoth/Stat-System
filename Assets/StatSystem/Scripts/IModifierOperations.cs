@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace StatSystem
+﻿namespace StatSystem
 {
 /// <summary>Defines the operations that can be performed on a collection of modifiers of the same type.</summary>
 public interface IModifiersOperations

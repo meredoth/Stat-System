@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using StatSystem.ModifierOperations;
 
 namespace StatSystem.Tests
 {
@@ -42,5 +43,16 @@ internal class ModifierTests
    [Test]
    public void OperatorEquals_EqualityForDefaultModifier_ReturnsTrue() => 
       Assert.IsTrue(_defaultModifier == _defaultValuesModifier);
+
+   [Test]
+   public void Apply_AfterAppliedToStat_StatHasModifier()
+   {
+      Stat stat = new(100);
+      Modifier sut = new(10, ModifierType.Flat);
+      
+      sut.ApplyTo(stat);
+      
+      Assert.IsTrue(stat.ContainsModifier(sut));
+   }
 }
 }

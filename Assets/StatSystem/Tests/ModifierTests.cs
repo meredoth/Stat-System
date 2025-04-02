@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.Collections.Generic;
+using NUnit.Framework;
 using StatSystem.ModifierOperations;
 
 namespace StatSystem.Tests
@@ -45,7 +46,7 @@ internal class ModifierTests
       Assert.IsTrue(_defaultModifier == _defaultValuesModifier);
 
    [Test]
-   public void Apply_AfterAppliedToStat_StatHasModifier()
+   public void ApplyTo_AfterAppliedToStat_StatHasModifier()
    {
       Stat stat = new(100);
       Modifier sut = new(10, ModifierType.Flat);
@@ -53,6 +54,22 @@ internal class ModifierTests
       sut.ApplyTo(stat);
       
       Assert.IsTrue(stat.ContainsModifier(sut));
+   }
+   
+   [Test]
+   public void ApplyTo_AfterAppliedToStats_AllStatsHaveModifier()
+   {
+      Stat stat = new(100);
+      Stat stat2 = new(200);
+      Stat stat3 = new(300);
+      Stat[] stats = { stat, stat2, stat3};
+      Modifier sut = new(10, ModifierType.Flat);
+      
+      sut.ApplyTo(stats);
+      
+      Assert.IsTrue(stat.ContainsModifier(sut));
+      Assert.IsTrue(stat2.ContainsModifier(sut));
+      Assert.IsTrue(stat3.ContainsModifier(sut));
    }
 }
 }

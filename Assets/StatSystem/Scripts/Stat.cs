@@ -138,6 +138,22 @@ public sealed partial class Stat
    /// <param name="modifiers">A list of modifiers to add.</param>
    public void AddModifiers(IEnumerable<Modifier> modifiers)
    {
+      if (modifiers == null)
+         throw new ArgumentNullException(nameof(modifiers));
+      
+      IsDirty = true;
+      
+      foreach (var modifier in modifiers)
+         _modifiersOperations[modifier.Type].AddModifier(modifier);
+   }
+   
+   /// <summary>Adds multiple modifiers to the stat.</summary>
+   /// <param name="modifiers">A params array of modifiers to add.</param>
+   public void AddModifiers(params Modifier[] modifiers)
+   {
+      if (modifiers == null)
+         throw new ArgumentNullException(nameof(modifiers));
+      
       IsDirty = true;
       
       foreach (var modifier in modifiers)
@@ -189,6 +205,9 @@ public sealed partial class Stat
    /// <returns><c>true</c> if any modifiers were removed; otherwise, <c>false</c>.</returns>
    public bool TryRemoveAllModifiersOf(object source)
    {
+      if (source == null)
+         throw new ArgumentNullException(nameof(source));
+      
       bool isModifierRemoved = false;
 
       for (int i = 0; i < _modifiersOperations.Count; i++)

@@ -99,6 +99,20 @@ internal class StatTests
         Assert.True(_testStat.ContainsModifier(_modifierCustom));
     }
     
+    [Test]
+    public void AddModifiers_AddParamArrayOfModifiers_ContainEachModifierReturnsTrue()
+    {
+        var numberOfModifiersBefore = _testStat.GetModifiers().Count;
+        _testStat.AddModifiers(_modifierFlat, _modifierAdditive, _modifierMultiplicative, _modifierCustom);
+        var numberOfModifiersAfter = _testStat.GetModifiers().Count;
+        
+        Assert.AreEqual(numberOfModifiersAfter, numberOfModifiersBefore + 4);
+        Assert.True(_testStat.ContainsModifier(_modifierFlat));
+        Assert.True(_testStat.ContainsModifier(_modifierAdditive));
+        Assert.True(_testStat.ContainsModifier(_modifierMultiplicative));
+        Assert.True(_testStat.ContainsModifier(_modifierCustom));
+    }
+    
     [TestCase(ModifierType.Flat)]
     [TestCase(ModifierType.Additive)]
     [TestCase(ModifierType.Multiplicative)]

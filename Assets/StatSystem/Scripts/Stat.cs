@@ -110,6 +110,9 @@ public sealed partial class Stat
    /// <exception cref="InvalidOperationException">Thrown if attempting to add a modifier type after stat initialization.</exception>
    public static ModifierType NewModifierType(int order, Func<IModifiersOperations> modifierOperationsDelegate)
    {
+      if (modifierOperationsDelegate == null)
+         throw new ArgumentNullException(nameof(modifierOperationsDelegate));
+      
       if(!CanAddNewModifierType)
          throw new InvalidOperationException("Add any modifier operations before any initialization of the Stat class!");
       
@@ -212,8 +215,7 @@ public sealed partial class Stat
 
       for (int i = 0; i < _modifiersOperations.Count; i++)
       {
-         if (TryRemoveAllModifiersOfSourceFromList(source,
-                _modifiersOperations.Values[i].GetAllModifiers().GetModifiersList()))
+         if (TryRemoveAllModifiersOfSourceFromList(source, _modifiersOperations.Values[i].GetAllModifiers().GetModifiersList()))
          {
             isModifierRemoved = true;
             IsDirty = true;

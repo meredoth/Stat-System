@@ -21,5 +21,8 @@ public interface IModifiersOperations
    /// <param name="currentValue">The current value of the stat after previous modifiers have been applied.</param>
    /// <returns>The calculated value of the stat after all modifiers have been applied.</returns>
    float CalculateModifiersValue(float baseValue, float currentValue);
+
+   /// <summary>Clears all modifiers from the collection.</summary>
+   void Clear();
 }
 }

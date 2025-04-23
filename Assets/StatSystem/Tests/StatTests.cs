@@ -294,6 +294,29 @@ internal class StatTests
         Assert.IsEmpty(modifiers);
     }
     
+    
+    [Test]
+    public void Clear_HasModifiers_HasZeroModifiers()
+    {
+        _testStat.AddModifier(_modifierFlat);
+        
+        _testStat.Clear();
+        
+        Assert.IsEmpty(_testStat.GetModifiers());
+        
+    }
+    
+    [Test]
+    public void Clear_HasZeroModifiers_ModifiersChangedIsNotInvoked()
+    {
+        int timesInvoked = 0;
+        _testStat.ModifiersChanged += () => timesInvoked++;
+        _testStat.Clear();
+        
+        Assert.Zero(timesInvoked);
+        
+    }
+    
     private class StubModifiersOperations : ModifierOperationsBase
     {
         public override float CalculateModifiersValue(float baseValue, float currentValue) => 0;

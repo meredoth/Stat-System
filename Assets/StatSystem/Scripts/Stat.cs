@@ -85,7 +85,7 @@ public sealed partial class Stat
          return _currentValue;
       }
    }
-
+   
    private bool IsDirty
    {
       get => _isDirty;
@@ -243,6 +243,19 @@ public sealed partial class Stat
       }
    }
 
+   /// <summary>Removes all modifiers from the stat.</summary>
+   public void Clear()
+   {
+      foreach (var operationType in _modifiersOperations.Keys)
+      {
+         if(_modifiersOperations[operationType].GetAllModifiers().Count > 0)
+         {
+            _modifiersOperations[operationType].Clear();
+            IsDirty = true;
+         }
+      }
+   }
+   
    /// <summary>Determines whether the stat contains a specific modifier.</summary>
    /// <param name="modifier">The modifier to check for.</param>
    /// <returns><c>true</c> if the stat contains the modifier; otherwise, <c>false</c>.</returns>

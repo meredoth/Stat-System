@@ -43,6 +43,9 @@ public abstract class ModifierOperationsBase : IModifiersOperations
    /// <returns>The calculated value of the stat after all modifiers have been applied.</returns>
    public abstract float CalculateModifiersValue(float baseValue, float currentValue);
 
+   /// <summary>Removes all modifiers from the list.</summary>
+   public void Clear() => Modifiers.Clear();
+
    [Conditional("UNITY_EDITOR")]
    private static void CheckListCapacity(List<Modifier> modifiersList, ModifierType type)
    {

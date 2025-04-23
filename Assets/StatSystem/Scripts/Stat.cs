@@ -85,7 +85,7 @@ public sealed partial class Stat
          return _currentValue;
       }
    }
-
+   
    private bool IsDirty
    {
       get => _isDirty;
@@ -138,21 +138,12 @@ public sealed partial class Stat
    }
    
    /// <summary>Adds multiple modifiers to the stat.</summary>
-   /// <param name="modifiers">A list of modifiers to add.</param>
-   public void AddModifiers(IEnumerable<Modifier> modifiers)
-   {
-      if (modifiers == null)
-         throw new ArgumentNullException(nameof(modifiers));
-      
-      IsDirty = true;
-      
-      foreach (var modifier in modifiers)
-         _modifiersOperations[modifier.Type].AddModifier(modifier);
-   }
+   /// <param name="modifiers">A params array of modifiers to add.</param>
+   public void AddModifiers(params Modifier[] modifiers) => AddModifiers(modifiers.AsSpan());
    
    /// <summary>Adds multiple modifiers to the stat.</summary>
-   /// <param name="modifiers">A params array of modifiers to add.</param>
-   public void AddModifiers(params Modifier[] modifiers)
+   /// <param name="modifiers">A list of modifiers to add.</param>
+   public void AddModifiers(IEnumerable<Modifier> modifiers)
    {
       if (modifiers == null)
          throw new ArgumentNullException(nameof(modifiers));
@@ -243,6 +234,19 @@ public sealed partial class Stat
       }
    }
 
+   /// <summary>Removes all modifiers from the stat.</summary>
+   public void Clear()
+   {
+      foreach (var operationType in _modifiersOperations.Keys)
+      {
+         if(_modifiersOperations[operationType].GetAllModifiers().Count > 0)
+         {
+            _modifiersOperations[operationType].Clear();
+            IsDirty = true;
+         }
+      }
+   }
+   
    /// <summary>Determines whether the stat contains a specific modifier.</summary>
    /// <param name="modifier">The modifier to check for.</param>
    /// <returns><c>true</c> if the stat contains the modifier; otherwise, <c>false</c>.</returns>

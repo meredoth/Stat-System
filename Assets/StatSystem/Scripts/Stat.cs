@@ -138,21 +138,12 @@ public sealed partial class Stat
    }
    
    /// <summary>Adds multiple modifiers to the stat.</summary>
-   /// <param name="modifiers">A list of modifiers to add.</param>
-   public void AddModifiers(IEnumerable<Modifier> modifiers)
-   {
-      if (modifiers == null)
-         throw new ArgumentNullException(nameof(modifiers));
-      
-      IsDirty = true;
-      
-      foreach (var modifier in modifiers)
-         _modifiersOperations[modifier.Type].AddModifier(modifier);
-   }
+   /// <param name="modifiers">A params array of modifiers to add.</param>
+   public void AddModifiers(params Modifier[] modifiers) => AddModifiers(modifiers.AsSpan());
    
    /// <summary>Adds multiple modifiers to the stat.</summary>
-   /// <param name="modifiers">A params array of modifiers to add.</param>
-   public void AddModifiers(params Modifier[] modifiers)
+   /// <param name="modifiers">A list of modifiers to add.</param>
+   public void AddModifiers(IEnumerable<Modifier> modifiers)
    {
       if (modifiers == null)
          throw new ArgumentNullException(nameof(modifiers));
